@@ -60,6 +60,7 @@ The coronavirus pandemic has changed everything overnight. Unfortunately, as the
 
 
 Some emerging results include the following:
+
 - There is no sign that hoax meme has run its course. Over our admittedly short sample period of about 10 days the overal share of hoax beliver tweets has increased.
 - There is some evidence that Donald Trump has to answer for the hoax meme. Hoax believers are particularly obsessed with him.
 - There is evidence that believe in Hoax led to more higher covid cases than necessary. Across US states we find a strong correlation between hoax believer rates and covid cases. We have to be careful with causal interpretations but the numbers would imply that US covid cases could be about 1/3 lower in absence of hoax belief.
