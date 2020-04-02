@@ -283,6 +283,7 @@ library(stargazer)
 stargazer(r1, r2, r3, type = "html")
 ```
 
+
 As the regression table above shows we find a statistically significant positive relationship bewteen statelevel hoaxism and per capita covid cases. This is robust to the inclusion of obvious controls such as population, population density and general tweet triggerness of the population. The relationship is also relevant in terms of its size: 1 percentage point more hoax tweets lead to about one more covid patient per 1000 citizens.
 
 
@@ -292,7 +293,7 @@ This would Numbers imply that in without hoaxism as of March 31 we would have  `
 
 Here is a scatter plot of covid cases (per capita) on memetic infection rates. Clearly, much depends on New York. However, it is particularly interesting to contrast New York and New Jersey. Both are geographically close and have similar population density. Covid cases in New Jersey are however dramatically lower (abeit still high). What accounts for the difference? Well, one difference are substantially lower rates of Hoaxism in New Jersey.
 
-```{r, fig.cap = "The effect of mis-information", echo=FALSE}
+```{r,  echo=FALSE}
 library(ggrepel)
 ggplot(stats) + 
     aes(y=casesPC, x=hoaxsh,label=state) +
@@ -304,7 +305,7 @@ ggplot(stats) +
 
 
 For comparison we also plot teh scatter plot of covid cases on population density.
-```{r, fig.cap = "The effect of density", echo=FALSE}
+```{r,  echo=FALSE}
 library(ggrepel)
 ggplot(stats) + 
     aes(y=casesPC, x=density,label=state) +
