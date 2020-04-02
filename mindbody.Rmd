@@ -69,7 +69,7 @@ Some emerging results include the following:
 
 
 
-# Infections with the hoax meme over time
+# Hoaxism over time
 
 How bad is the hoax infection and is it getting better or worse? To identify tweeters believing in the hoax (or promoting the hoax idea) we look for tweets with one of the following hastags:
 
@@ -78,11 +78,11 @@ How bad is the hoax infection and is it getting better or worse? To identify twe
 - "#covidhoax"
 - "#chinesevirus"
 
-Using hashtags instead of string searches of the same terms provides a good distinction between tweets who display support for the hoax believe vs tweets criticising the idea that the corona pandemic could be based on a hoax or conspiracy.
+Using hashtags instead of string searches of the same terms provides a good distinction between tweets who display support for hoaxsim vs tweets criticising hoaxism. Note that this is likely a conservative way of counting hoaxist tweets and in reality a larger fraction of tweets are from people supporting hoaxist ideas.
 
-Below is a time series plot of the share of "hoax believe" tweets over our sample period. we report separate series for the Us and UK. Assigning location to tweets is notoriously difficult as most users haven't switch on detailed tracking. In the figure below we base location on the analysis of a free text field where users can write something about their whereabouts. In many cases this refers to clear areas although the detail varies (e.g. London, UK vs the Universe). Often it also involves phantasy locations (e.g. Walhala). Hence, our "other" category might include tweeters from either the UK or Us who have chosen not to reveal their location.
+Below is a time series plot of the share of hoaxist tweets over our sample period. we report separate series for the Us and UK. Assigning location to tweets is notoriously difficult as most users have switch off detailed location tracking. In the figure below we base location on the analysis of a free text field where users can write something about their whereabouts. In many cases this refers to known areas although the detail varies (e.g. London, UK vs the Universe). Often it also involves phantasy locations (e.g. Walhalla). Hence, our "other" category might include tweeters from either the UK or Us who have chosen not to reveal their location.
 
-Note that twoards the begining of the sample period share of hoax tweets in all covid related tweets is less than 0.5%. However, the weekend of around the 28th of March saw a major outbreak of Hoaxismt that was particularly bad in the UK. This has subsided somewhat come March 30. However, hoaxism levels remain higher than a week ago particularly in the UK.
+Note that towards the begining of the sample period the share of hoax tweets in all covid related tweets is less than 0.5%. However, the weekend  around the 28th of March saw a major outbreak of Hoaxism that was particularly bad in the UK. This has subsided somewhat come March 30. However, hoaxism levels remain higher than a week ago particularly in the UK.
 
 ```{r tsplot,echo=FALSE}
 tsplot=ggplot(scomb, aes(x = date,y=hoaxsh,color=country  )  )+geom_point() +  geom_line() + theme_minimal() + xlab("Time") +ylab("Share of hoax tweets [%]")
