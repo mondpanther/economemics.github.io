@@ -245,16 +245,16 @@ r4=lm(casesPC~hoaxsh*density+pop+tweetsPC,stats)
 
 #stats=stats%>%mutate(DD=  (r4$coefficients[["hoaxsh"]]+r4$coefficients[["hoaxsh:density"]]*density) *hoaxsh * pop/1000)
 stats=stats%>%mutate(DD=  (r3$coefficients[["hoaxsh"]]) *hoaxsh * pop/1000)
-sum(stats$DD)
-sum(stats$cases)
+#sum(stats$DD)
+#sum(stats$cases)
 
 
-sum(stats$DD)
-sum(stats$cases)
+#sum(stats$DD)
+#sum(stats$cases)
 
-summary(r1)
-summary(r2)
-summary(r3)
+#summary(r1)
+#summary(r2)
+#summary(r3)
 #summary(r4)
 
 sss=stats%>%summarise(pop=sum(pop),cases=sum(cases), tweets=sum(tweets),hoax=sum(hoax))
