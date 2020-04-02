@@ -62,7 +62,7 @@ The coronavirus pandemic has changed everything overnight. Unfortunately, as the
 
 Some emerging results include the following:
 
-- There is no sign that hoax meme has run its course. Over our admittedly short sample period of about 10 days the overal share of hoax beliver tweets has increased.
+- There is no sign that hoax meme has run its course. Over our admittedly short sample period of about 10 days the overal share of hoax believer tweets has increased.
 - There is some evidence that Donald Trump has to answer for the hoax meme. Hoax believers are particularly obsessed with him.
 - There is evidence that believe in Hoax led to more higher covid cases than necessary. Across US states we find a strong correlation between hoax believer rates and covid cases. We have to be careful with causal interpretations but the numbers would imply that US covid cases could be about 1/3 lower in absence of hoax belief.
 
@@ -195,7 +195,7 @@ wc(textsref)
 ```
 
 
-So both hoaxers and non hoaxers tweet a lot about Trump (besides covid19). But which of the two groups is more obsessed about Trump? Let's run a quick regressions:
+So both hoaxers and non hoaxers tweet a lot about Trump (besides covid19). But which of the two groups is more obsessed about Trump? Let's run a quick regression:
 
 
 ```{r,echo=FALSE}
@@ -224,7 +224,8 @@ We see that hoaxers are significantly more obsessed with Trump, but the effect i
 
 # The consequences of memetic infections
 
-We examine if US state level hoax infection rates are correlated with reported covid19 infection rates. This is interesting to gauge if mis-information 
+We examine if US state level hoax infection rates are correlated with reported covid19 infection rates. This is interesting to gauge if mis-information has any effect on actual outcomes. Clearly, from a simple exercise like that we cannot draw overly strong conclusions about causal effects. However, it is a useful starting point. 
+
 
 
 ```{r statelevel,echo=FALSE}
@@ -261,7 +262,7 @@ sss=sss%>% mutate(hoaxsh=hoax/tweets*100,casesPC=cases/pop*1000)
 sss=sss%>% mutate(saved=r2$coefficients[["hoaxsh"]]*hoaxsh*pop/1000)
 
 
-coef=r2$coefficients[["hoaxsh"]]
+coef=r3$coefficients[["hoaxsh"]]
 
 
 
@@ -269,8 +270,8 @@ stats=stats%>% mutate(saved=coef*hoaxsh*pop/1000)
 
 #look=stats%>% select(c(hoaxsh,saved,casesPC))
 #View(look)
-sum(stats$saved)
-sum(stats$cases)
+saved=sum(stats$saved)
+all=sum(stats$cases)
 
 
 #summary(lm(casesPC~hoaxsh+density,stats))
@@ -284,13 +285,16 @@ library(stargazer)
 stargazer(r1, r2, r3, type = "html")
 ```
 
+As the regression table above shows we find a statistically significant positive relationship bewteen statelevel hoaxism and per capita covid cases. This is robust to the inclusion of obvious controls such as population, population density and general tweet triggerness of the population. The relationship is also relevant in terms of its size: 1 percentage point more hoax tweets lead to about one more covid patient per 1000 citizens.
+
+
+This would Numbers imply that in without hoaxism as of March 31 we would have  `r saved` covid cases less (of `r all`).
 
 
 
-```
+Here is a scatter plot of covid cases (per capita) on memetic infection rates. Clearly, much depends on New York. However, it is particularly interesting to contrast New York and New Jersey. Both are geographically close and have similar population density. Covid cases in New Jersey are however dramatically lower (abeit still high). What accounts for the difference? Well, one difference are substantially lower rates of Hoaxism in New Jersey.
 
-
-```{r, fig.cap = "The effect of mis-information"}
+```{r, fig.cap = "The effect of mis-information", echo=FALSE}
 library(ggrepel)
 ggplot(stats) + 
     aes(y=casesPC, x=hoaxsh,label=state) +
@@ -300,7 +304,9 @@ ggplot(stats) +
 
 ```
 
-```{r, fig.cap = "The effect of density"}
+
+For comparison we also plot teh scatter plot of covid cases on population density.
+```{r, fig.cap = "The effect of density", echo=FALSE}
 library(ggrepel)
 ggplot(stats) + 
     aes(y=casesPC, x=density,label=state) +
