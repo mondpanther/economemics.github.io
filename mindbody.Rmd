@@ -28,7 +28,7 @@ library(gdata)
 
 
 
-source("gettoken.R")
+source("../code/gettoken.R")
 
 
 ```
@@ -116,27 +116,19 @@ library(tm)
 
 
 
-texts=readRDS("../results/texts.rda")
-textsref=readRDS("../results/textsref.rda")
+tmls=readRDS("../results/tmls.rda")
+tmlsnon=readRDS("../results/tmlsnon.rda")
 
 
 texts=tmls[,c('status_id','text')]
-texts=texts%>%rename(doc_id=status_id)
+
+
+texts=texts%>%dplyr::rename(doc_id=status_id)
 
 
 textsref=tmlsnon[,c('status_id','text')]
-textsref=textsref%>%rename(doc_id=status_id)
+textsref=textsref%>%dplyr::rename(doc_id=status_id)
 
-
-
-texts['hoaxer']=TRUE
-textsref['hoaxer']=FALSE
-
-
-ctexts=rbind(texts,textsref)
-
-
-ctexts['trumpid'] <-  mapply(grepl, pattern="trump", x=tolower(ctexts$text) )
 
 
 
@@ -159,6 +151,8 @@ wc=function(texts){
     texts$text=gsub("[\r\n]", "", texts$text)
     texts$text=gsub("[[:punct:]]", "", texts$text)
   
+    
+    
     docs=Corpus(DataframeSource(texts))
     docs <- docs %>%
       tm_map(removeNumbers) %>%
@@ -180,7 +174,7 @@ wc=function(texts){
 ```
 
 
-```{r wordclouds}
+```{r wordcloudsregs}
 
 wc(texts)
 #names(combstream)
@@ -196,6 +190,21 @@ So both hoaxers and non hoaxers tweet a lot about Trump (besides covid19). But w
 
 
 ```{r}
+
+texts['hoaxer']=TRUE
+textsref['hoaxer']=FALSE
+
+
+ctexts=rbind(texts,textsref)
+
+
+ctexts['trumpid'] <-  mapply(grepl, pattern="trump", x=tolower(ctexts$text) )
+
+
+
+
+
+
 tr=lm(trumpid~hoaxer,ctexts)
 summary(tr)
 
@@ -245,15 +254,12 @@ sss=sss%>% mutate(saved=r2$coefficients[["hoaxsh"]]*hoaxsh*pop/1000)
 
 coef=r2$coefficients[["hoaxsh"]]
 
-sss
-
-Dsh=sss
 
 
 stats=stats%>% mutate(saved=coef*hoaxsh*pop/1000)
 
-look=stats%>% select(c(hoaxsh,saved,casesPC))
-View(look)
+#look=stats%>% select(c(hoaxsh,saved,casesPC))
+#View(look)
 sum(stats$saved)
 sum(stats$cases)
 
@@ -264,7 +270,7 @@ sum(stats$cases)
 
 
 
-```{r regtable}
+```{r regtable,eval=FALSE}
 library(memisc)
 
 mtap <- mtable('Model 1' = r1,
@@ -272,8 +278,18 @@ mtap <- mtable('Model 1' = r1,
             'Model 3' = r3,
             summary.stats = c('R-squared','F','p','N'))
 
+library(pander)
 
-pander(mtable123)
+pander(mtab)
+
+```
+
+```{r  message=FALSE, results='asis'} 
+library(stargazer)
+
+stargazer(r1, r2, r3, type = "html")
+```
+
 
 
 
