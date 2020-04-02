@@ -56,7 +56,7 @@ nhoax=sum(scomb$igtweets)
 # Introduction
 
 
-The coronavirus pandemic has changed everything overnight. Unfortunately, as the genetic sequence of the virus started to make its deadly journey through bodies around the world, in parallel a memetic sequence emerged in the minds of some people: the idea that covid19 pandemic is not real and a hoax. Indeed, the worry is that the two infections exist in a symbiotic relationship with one helping to advance the survival and spread of the other. Here we report on our ongoing efforts to map the spread of memetic infection using Twitter. Since March 23 we have been sampling tweets mentioning the terms “corona” and/or “covid”. Currently, we have collected  nearly `r ntweets` tweets  with the terms "corona" or "covid".
+The coronavirus pandemic has changed everything overnight. Unfortunately, as the genetic sequence of the virus started to make its deadly journey through bodies around the world, in parallel a memetic sequence emerged in the minds of some people: the idea that covid19 pandemic is not real and a hoax. Indeed, the worry is that the two infections exist in a symbiotic relationship with one helping to advance the survival and spread of the other. Here we report on our ongoing efforts to map the spread of memetic infection using Twitter. Since March 23 we have been sampling tweets mentioning the terms “corona” and/or “covid”. Currently, we have collected   `r ntweets` million  tweets  with the terms "corona" or "covid".
 
 
 Some emerging results include the following:
@@ -81,7 +81,7 @@ Using hashtags instead of string searches of the same terms provides a good dist
 
 Below is a time series plot of the share of "hoax believe" tweets over our sample period. we report separate series for the Us and UK. Assigning location to tweets is notoriously difficult as most users haven't switch on detailed tracking. In the figure below we base location on the analysis of a free text field where users can write something about their whereabouts. In many cases this refers to clear areas although the detail varies (e.g. London, UK vs the Universe). Often it also involves phantasy locations (e.g. Walhala). Hence, our "other" category might include tweeters from either the UK or Us who have chosen not to reveal their location.
 
-```{r tsplot}
+```{r tsplot,include=FALSE}
 tsplot=ggplot(scomb, aes(x = date,y=hoaxsh,color=country  )  )+geom_point() +  geom_line() + theme_minimal() + xlab("Time") +ylab("Share of hoax tweets [%]")
 
 tsplot
