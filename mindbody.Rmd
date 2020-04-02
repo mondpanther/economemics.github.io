@@ -286,7 +286,7 @@ stargazer(r1, r2, r3, type = "html")
 As the regression table above shows we find a statistically significant positive relationship bewteen statelevel hoaxism and per capita covid cases. This is robust to the inclusion of obvious controls such as population, population density and general tweet triggerness of the population. The relationship is also relevant in terms of its size: 1 percentage point more hoax tweets lead to about one more covid patient per 1000 citizens.
 
 
-This would Numbers imply that in without hoaxism as of March 31 we would have  `r saved` covid cases less (of `r all`).
+This would Numbers imply that in without hoaxism as of March 31 we would have  `r format(saved,scientific=FALSE)` covid cases less (of `r format(all,scientific=FALSE)`).
 
 
 
