@@ -1,11 +1,12 @@
 ---
 title: "Infections of the body and the mind"
-author: "Julio Amador Diaz Lopez and Ralf Martin" 
 output: html_document
 css:    mondstyle.css
+editor_options: 
+  chunk_output_type: inline
 ---
 
-
+**by Julio Amador Diaz Lopez (Imperial College Business School, ICBS) and Ralf Martin (ICBS & CEP, LSE) ** 
 
 
 ```{r Notes,eval=FALSE,include=FALSE}
@@ -81,7 +82,9 @@ Using hashtags instead of string searches of the same terms provides a good dist
 
 Below is a time series plot of the share of "hoax believe" tweets over our sample period. we report separate series for the Us and UK. Assigning location to tweets is notoriously difficult as most users haven't switch on detailed tracking. In the figure below we base location on the analysis of a free text field where users can write something about their whereabouts. In many cases this refers to clear areas although the detail varies (e.g. London, UK vs the Universe). Often it also involves phantasy locations (e.g. Walhala). Hence, our "other" category might include tweeters from either the UK or Us who have chosen not to reveal their location.
 
-```{r tsplot,include=FALSE}
+Note that twoards the begining of the sample period 
+
+```{r tsplot,echo=FALSE}
 tsplot=ggplot(scomb, aes(x = date,y=hoaxsh,color=country  )  )+geom_point() +  geom_line() + theme_minimal() + xlab("Time") +ylab("Share of hoax tweets [%]")
 
 tsplot
@@ -102,7 +105,7 @@ tsplot
 # What else are hoaxers tweeting about?
 
 
-```{r, wordclouds}
+```{r wordclouds,include=FALSE, echo=FALSE}
 
 #tmls['ccid'] <-     mapply(grepl, pattern="climate", x=tolower(tmls$text) )
 #tmls['trumpid'] <-  mapply(grepl, pattern="trump", x=tolower(tmls$text) )
@@ -175,13 +178,17 @@ wc=function(texts){
 }
 ```
 
-
-```{r wordcloudsregs}
+Here is a word cloud of the last 500 tweets of the 100 most prolific hoax believers. 
+```{r wordcloudsregs, echo=FALSE}
 
 wc(texts)
 #names(combstream)
 #textsref=subset(comb, select = c(status_id,text))
 #textsref=textsref%>%rename(doc_id=status_id)
+```
+
+For comparison a word could of the 100 most prolific non-hoax believing tweeters.
+```{r nonhoaxer,echo=FALSE}
 wc(textsref)
 
 
@@ -191,7 +198,7 @@ wc(textsref)
 So both hoaxers and non hoaxers tweet a lot about Trump (besides covid19). But which of the two groups is more obsessed about Trump? Let's run a quick regressions:
 
 
-```{r}
+```{r,echo=FALSE}
 
 texts['hoaxer']=TRUE
 textsref['hoaxer']=FALSE
@@ -211,16 +218,16 @@ tr=lm(trumpid~hoaxer,ctexts)
 summary(tr)
 
 ```
-We see that hoaxers are significantly more obsessed with Trump, but the effect is small: hoaxers have a  `r tr2$coefficients[["hoaxerTRUE"]]*100 ' percentage point higher probability of mentioning Trump.
+We see that hoaxers are significantly more obsessed with Trump, but the effect is small: hoaxers have a  `r round(tr$coefficients[["hoaxerTRUE"]]*100,2) ` percentage point higher probability of mentioning Trump.
 
 
 
 # The consequences of memetic infections
 
-We examine if US state level hoax infection rates are correlated with reported covid19 infection rates.
+We examine if US state level hoax infection rates are correlated with reported covid19 infection rates. This is interesting to gauge if mis-information 
 
 
-```{r statelevel}
+```{r statelevel,echo=FALSE}
 
 
 
@@ -271,22 +278,7 @@ sum(stats$cases)
 ```
 
 
-
-```{r regtable,eval=FALSE}
-library(memisc)
-
-mtap <- mtable('Model 1' = r1,
-            'Model 2' = r2,
-            'Model 3' = r3,
-            summary.stats = c('R-squared','F','p','N'))
-
-library(pander)
-
-pander(mtab)
-
-```
-
-```{r  message=FALSE, results='asis'} 
+```{r  message=FALSE, results='asis',echo=FALSE} 
 library(stargazer)
 
 stargazer(r1, r2, r3, type = "html")
