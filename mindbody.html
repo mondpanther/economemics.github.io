@@ -420,69 +420,6 @@ summary {
 <div id="the-consequences-of-memetic-infections" class="section level1">
 <h1>The consequences of memetic infections</h1>
 <p>We examine if US state level hoax infection rates are correlated with reported covid19 infection rates. This is interesting to gauge if mis-information has any effect on actual outcomes. Clearly, from a simple exercise like that we cannot draw overly strong conclusions about causal effects. However, it is a useful starting point.</p>
-<pre><code>## [1] 107112</code></pre>
-<pre><code>## [1] 158892</code></pre>
-<pre><code>## [1] 107112</code></pre>
-<pre><code>## [1] 158892</code></pre>
-<pre><code>## 
-## Call:
-## lm(formula = casesPC ~ hoaxsh, data = stats)
-## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -0.64310 -0.23221 -0.12634  0.03346  2.60378 
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)  
-## (Intercept)  0.04824    0.15686   0.308   0.7598  
-## hoaxsh       0.84809    0.39113   2.168   0.0353 *
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Residual standard error: 0.5208 on 46 degrees of freedom
-## Multiple R-squared:  0.09273,    Adjusted R-squared:  0.073 
-## F-statistic: 4.701 on 1 and 46 DF,  p-value: 0.03535</code></pre>
-<pre><code>## 
-## Call:
-## lm(formula = casesPC ~ hoaxsh + density + pop, data = stats)
-## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -0.63442 -0.19366 -0.01781  0.08434  2.14350 
-## 
-## Coefficients:
-##               Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept) -3.150e-01  1.569e-01  -2.008 0.050787 .  
-## hoaxsh       1.076e+00  3.361e-01   3.201 0.002547 ** 
-## density      9.999e-04  2.439e-04   4.101 0.000175 ***
-## pop          1.053e-08  8.638e-09   1.220 0.229114    
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Residual standard error: 0.4402 on 44 degrees of freedom
-## Multiple R-squared:  0.3801, Adjusted R-squared:  0.3378 
-## F-statistic: 8.993 on 3 and 44 DF,  p-value: 9.261e-05</code></pre>
-<pre><code>## 
-## Call:
-## lm(formula = casesPC ~ hoaxsh + density + pop + tweetsPC, data = stats)
-## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -0.66496 -0.21830 -0.01394  0.10158  2.00802 
-## 
-## Coefficients:
-##               Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept) -5.227e-01  2.010e-01  -2.601 0.012705 *  
-## hoaxsh       9.085e-01  3.461e-01   2.625 0.011958 *  
-## density      9.095e-04  2.461e-04   3.696 0.000615 ***
-## pop          1.815e-09  1.007e-08   0.180 0.857758    
-## tweetsPC     2.854e-01  1.773e-01   1.610 0.114794    
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Residual standard error: 0.4325 on 43 degrees of freedom
-## Multiple R-squared:  0.4153, Adjusted R-squared:  0.3609 
-## F-statistic: 7.636 on 4 and 43 DF,  p-value: 9.673e-05</code></pre>
 <table style="text-align:center">
 <tr>
 <td colspan="4" style="border-bottom: 1px solid black">
