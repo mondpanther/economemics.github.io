@@ -2,12 +2,13 @@
 title: "Infections of the body and the mind"
 author: "Julio Amador Diaz Lopez and Ralf Martin" 
 output: html_document
+css:    mondstyle.css
 ---
 
 
 
 
-```{r Notes,eval=FALSE}
+```{r Notes,eval=FALSE,include=FALSE}
 #We are using this: https://www.earthdatascience.org/courses/earth-analytics/get-data-using-apis/use-twitter-api-r/
 
 #This is useful too: https://rtweet.info/
@@ -37,7 +38,7 @@ source("../code/gettoken.R")
 
 
 
-```{r load ts data}
+```{r load ts data,include=FALSE}
 #`r ntweets'
 
 scomb=readRDS("../results/scomb.rda")
@@ -55,7 +56,7 @@ nhoax=sum(scomb$igtweets)
 # Introduction
 
 
-The coronavirus pandemic has changed everything overnight. Unfortunately, as the genetic sequence of the virus started to make its deadly journey through bodies around the world, in parallel a memetic sequence emerged in the minds of some people: the idea that covid19 pandemic is not real and a hoax. Indeed, the worry is that the two infections exist in a symbiotic relationship with one helping to advance the survival and spread of the other. Here we report on our ongoing efforts to map the spread of memetic infection using Twitter. Since March 23 we have been sampling tweets mentioning the terms “corona” and/or “covid”. Currently, we have collected  nearly `r ntweets' tweets  with the terms "corona" or "covid".
+The coronavirus pandemic has changed everything overnight. Unfortunately, as the genetic sequence of the virus started to make its deadly journey through bodies around the world, in parallel a memetic sequence emerged in the minds of some people: the idea that covid19 pandemic is not real and a hoax. Indeed, the worry is that the two infections exist in a symbiotic relationship with one helping to advance the survival and spread of the other. Here we report on our ongoing efforts to map the spread of memetic infection using Twitter. Since March 23 we have been sampling tweets mentioning the terms “corona” and/or “covid”. Currently, we have collected  nearly `r ntweets` tweets  with the terms "corona" or "covid".
 
 
 Some emerging results include the following:
