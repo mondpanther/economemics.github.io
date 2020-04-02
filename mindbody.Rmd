@@ -310,7 +310,8 @@ ggplot(stats) +
 ```
 
 
-For comparison we also plot teh scatter plot of covid cases on population density.
+
+For comparison we also plot the scatter plot of covid cases on population density.
 ```{r,  echo=FALSE}
 library(ggrepel)
 ggplot(stats) + 
