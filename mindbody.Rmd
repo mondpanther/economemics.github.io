@@ -1,0 +1,302 @@
+---
+title: "Infections of the body and the mind"
+author: "Julio Amador Diaz Lopez and Ralf Martin" 
+output: html_document
+---
+
+
+
+
+```{r Notes,eval=FALSE}
+#We are using this: https://www.earthdatascience.org/courses/earth-analytics/get-data-using-apis/use-twitter-api-r/
+
+#This is useful too: https://rtweet.info/
+
+```
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(rtweet)
+library(tidytext)
+
+# plotting and pipes - tidyverse!
+library(ggplot2)
+library(dplyr)
+library(gdata)
+
+
+
+source("gettoken.R")
+
+
+```
+
+
+
+
+
+```{r load ts data}
+#`r ntweets'
+
+scomb=readRDS("../results/scomb.rda")
+
+ntweets= round(sum(scomb$tweets) /10^6,2)
+
+
+
+nhoax=sum(scomb$igtweets)
+
+```
+
+
+
+# Introduction
+
+
+The coronavirus pandemic has changed everything overnight. Unfortunately, as the genetic sequence of the virus started to make its deadly journey through bodies around the world, in parallel a memetic sequence emerged in the minds of some people: the idea that covid19 pandemic is not real and a hoax. Indeed, the worry is that the two infections exist in a symbiotic relationship with one helping to advance the survival and spread of the other. Here we report on our ongoing efforts to map the spread of memetic infection using Twitter. Since March 23 we have been sampling tweets mentioning the terms “corona” and/or “covid”. Currently, we have collected  nearly `r ntweets' tweets  with the terms "corona" or "covid".
+
+
+Some emerging results include the following:
+- There is no sign that hoax meme has run its course. Over our admittedly short sample period of about 10 days the overal share of hoax beliver tweets has increased.
+- There is some evidence that Donald Trump has to answer for the hoax meme. Hoax believers are particularly obsessed with him.
+- There is evidence that believe in Hoax led to more higher covid cases than necessary. Across US states we find a strong correlation between hoax believer rates and covid cases. We have to be careful with causal interpretations but the numbers would imply that US covid cases could be about 1/3 lower in absence of hoax belief.
+
+
+
+
+# Infections with the hoax meme over time
+
+How bad is the hoax infection and is it getting better or worse? To identify tweeters believing in the hoax (or promoting the hoax idea) we look for tweets with one of the following hastags:
+
+- "#hoax"
+- "#coronahoax"
+- "#covidhoax"
+- "#chinesevirus"
+
+Using hashtags instead of string searches of the same terms provides a good distinction between tweets who display support for the hoax believe vs tweets criticising the idea that the corona pandemic could be based on a hoax or conspiracy.
+
+Below is a time series plot of the share of "hoax believe" tweets over our sample period. we report separate series for the Us and UK. Assigning location to tweets is notoriously difficult as most users haven't switch on detailed tracking. In the figure below we base location on the analysis of a free text field where users can write something about their whereabouts. In many cases this refers to clear areas although the detail varies (e.g. London, UK vs the Universe). Often it also involves phantasy locations (e.g. Walhala). Hence, our "other" category might include tweeters from either the UK or Us who have chosen not to reveal their location.
+
+```{r tsplot}
+tsplot=ggplot(scomb, aes(x = date,y=hoaxsh,color=country  )  )+geom_point() +  geom_line() + theme_minimal() + xlab("Time") +ylab("Share of hoax tweets [%]")
+
+tsplot
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+# What else are hoaxers tweeting about?
+
+
+```{r, wordclouds}
+
+#tmls['ccid'] <-     mapply(grepl, pattern="climate", x=tolower(tmls$text) )
+#tmls['trumpid'] <-  mapply(grepl, pattern="trump", x=tolower(tmls$text) )
+#tmls['clintonid'] <-  mapply(grepl, pattern="clinton", x=tolower(tmls$text) )  
+#tmls['coronaORcovid'] <-     mapply(grepl, pattern="corona", x=tolower(tmls$text) ) |  mapply(grepl, pattern="covid", x=tolower(tmls$text) )
+#summary(tmls$trumpid)
+#summary(tmls$clintonid)
+#summary(tmls$coronaORcovid)
+#cc=tmls%>%filter(ccid==TRUE)
+#nrow(tmls%>%filter(ccid==TRUE))
+
+library(tm)
+
+
+
+texts=readRDS("../results/texts.rda")
+textsref=readRDS("../results/textsref.rda")
+
+
+texts=tmls[,c('status_id','text')]
+texts=texts%>%rename(doc_id=status_id)
+
+
+textsref=tmlsnon[,c('status_id','text')]
+textsref=textsref%>%rename(doc_id=status_id)
+
+
+
+texts['hoaxer']=TRUE
+textsref['hoaxer']=FALSE
+
+
+ctexts=rbind(texts,textsref)
+
+
+ctexts['trumpid'] <-  mapply(grepl, pattern="trump", x=tolower(ctexts$text) )
+
+
+
+
+
+#install.packages("wordcloud")
+library(wordcloud)
+#install.packages("RColorBrewer")
+library(RColorBrewer)
+#install.packages("wordcloud2")
+library(wordcloud2)
+
+
+wc=function(texts){
+  
+    texts$text=gsub("más", "", texts$text)
+    texts$text=gsub("https\\S*", "", texts$text)
+    texts$text=gsub("@\\S*", ""    , texts$text)
+    texts$text=gsub("amp", "", texts$text) 
+    texts$text=gsub("[\r\n]", "", texts$text)
+    texts$text=gsub("[[:punct:]]", "", texts$text)
+  
+    docs=Corpus(DataframeSource(texts))
+    docs <- docs %>%
+      tm_map(removeNumbers) %>%
+      tm_map(removePunctuation) %>%
+      tm_map(stripWhitespace)
+    
+    docs <- tm_map(docs, content_transformer(tolower))
+    docs <- tm_map(docs, removeWords, stopwords("english"))
+    
+    dtm <- TermDocumentMatrix(docs) 
+    matrix <- as.matrix(dtm) 
+    words <- sort(rowSums(matrix),decreasing=TRUE) 
+    df <- data.frame(word = names(words),freq=words)
+    
+    
+    set.seed(1234) # for reproducibility 
+    wordcloud(words = df$word, freq = df$freq, min.freq = 1,       max.words=100, random.order=FALSE, rot.per=0.2,                colors=brewer.pal(8, "Dark2"))
+}
+```
+
+
+```{r wordclouds}
+
+wc(texts)
+#names(combstream)
+#textsref=subset(comb, select = c(status_id,text))
+#textsref=textsref%>%rename(doc_id=status_id)
+wc(textsref)
+
+
+```
+
+
+So both hoaxers and non hoaxers tweet a lot about Trump (besides covid19). But which of the two groups is more obsessed about Trump? Let's run a quick regressions:
+
+
+```{r}
+tr=lm(trumpid~hoaxer,ctexts)
+summary(tr)
+
+```
+We see that hoaxers are significantly more obsessed with Trump, but the effect is small: hoaxers have a  `r tr2$coefficients[["hoaxerTRUE"]]*100 ' percentage point higher probability of mentioning Trump.
+
+
+
+# The consequences of memetic infections
+
+We examine if US state level hoax infection rates are correlated with reported covid19 infection rates.
+
+
+```{r statelevel}
+
+
+
+stats=readRDS("../results/stats.Rda")
+
+r1=lm(casesPC~hoaxsh,stats)
+r2=lm(casesPC~hoaxsh+density+pop,stats)
+
+
+r3=lm(casesPC~hoaxsh+density+pop+tweetsPC,stats)
+r4=lm(casesPC~hoaxsh*density+pop+tweetsPC,stats)
+
+
+
+#stats=stats%>%mutate(DD=  (r4$coefficients[["hoaxsh"]]+r4$coefficients[["hoaxsh:density"]]*density) *hoaxsh * pop/1000)
+stats=stats%>%mutate(DD=  (r3$coefficients[["hoaxsh"]]) *hoaxsh * pop/1000)
+sum(stats$DD)
+sum(stats$cases)
+
+
+sum(stats$DD)
+sum(stats$cases)
+
+summary(r1)
+summary(r2)
+summary(r3)
+#summary(r4)
+
+sss=stats%>%summarise(pop=sum(pop),cases=sum(cases), tweets=sum(tweets),hoax=sum(hoax))
+sss=sss%>% mutate(hoaxsh=hoax/tweets*100,casesPC=cases/pop*1000)
+sss=sss%>% mutate(saved=r2$coefficients[["hoaxsh"]]*hoaxsh*pop/1000)
+
+
+coef=r2$coefficients[["hoaxsh"]]
+
+sss
+
+Dsh=sss
+
+
+stats=stats%>% mutate(saved=coef*hoaxsh*pop/1000)
+
+look=stats%>% select(c(hoaxsh,saved,casesPC))
+View(look)
+sum(stats$saved)
+sum(stats$cases)
+
+
+#summary(lm(casesPC~hoaxsh+density,stats))
+#summary(lm(casesPC~hoaxsh+density+tweetsPC,stats))
+```
+
+
+
+```{r regtable}
+library(memisc)
+
+mtap <- mtable('Model 1' = r1,
+            'Model 2' = r2,
+            'Model 3' = r3,
+            summary.stats = c('R-squared','F','p','N'))
+
+
+pander(mtable123)
+
+
+
+```
+
+
+```{r, fig.cap = "The effect of mis-information"}
+library(ggrepel)
+ggplot(stats) + 
+    aes(y=casesPC, x=hoaxsh,label=state) +
+    geom_point() +geom_text_repel(cex=2)+
+    stat_smooth(method = "lm", se = FALSE)+theme_minimal()+ylab("Covid Cases per 1000")+xlab("Share of hoax tweets in %")
+
+
+```
+
+```{r, fig.cap = "The effect of density"}
+library(ggrepel)
+ggplot(stats) + 
+    aes(y=casesPC, x=density,label=state) +
+    geom_point() +geom_text_repel(cex=2)+
+    stat_smooth(method = "lm", se = FALSE)+theme_minimal()+ylab("Covid Cases per 1000")+xlab("Density")
+
+
+```
+
