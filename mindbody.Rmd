@@ -8,6 +8,7 @@ editor_options:
 
 **by Julio Amador Diaz Lopez^[Imperial College Business School] and Ralf Martin^[ICBS & CEP, LSE]** 
 
+Last update:  `r format(Sys.time(), '%B %d , %Y - %H:%M ')`
 
 ```{r Notes,eval=FALSE,include=FALSE}
 #We are using this: https://www.earthdatascience.org/courses/earth-analytics/get-data-using-apis/use-twitter-api-r/
