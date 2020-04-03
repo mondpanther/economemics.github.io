@@ -201,8 +201,6 @@ wc(textsref)
 ```
 
 
-So both hoaxers and non hoaxers tweet a lot about Trump (besides covid19). But which of the two groups is more obsessed about Trump? Let's run a quick regression:
-
 
 ```{r,echo=FALSE}
 
@@ -221,10 +219,11 @@ ctexts['trumpid'] <-  mapply(grepl, pattern="trump", x=tolower(ctexts$text) )
 
 
 tr=lm(trumpid~hoaxer,ctexts)
-summary(tr)
+#summary(tr)
 
 ```
-We see that hoaxers are significantly more obsessed with Trump, but the effect is small: hoaxers have a  `r round(tr$coefficients[["hoaxerTRUE"]]*100,2) ` percentage point higher probability of mentioning Trump.
+So both hoaxers and non hoaxers tweet a lot about Trump (besides covid19). But which of the two groups is more obsessed about Trump? 
+Analysis of the data suggests that Hoaxists mention Trump signficantly more but the effect is not very big: hoaxers have a  `r round(tr$coefficients[["hoaxerTRUE"]]*100,2) ` percentage point higher probability of mentioning Trump (The share of Trump mentions across both groups is `r round(mean(ctexts$trumpid)*100,2)`%).
 
 
 
