@@ -6,7 +6,7 @@ editor_options:
   chunk_output_type: inline
 ---
 
-**by Julio Amador Diaz Lopez^[Imperial College Business School] and Ralf Martin^[ICBS & CEP, LSE]** 
+**by [Julio Amador Diaz Lopez](https://www.imperial.ac.uk/people/j.amador)^[Imperial College Business School] and [Ralf Martin](https://www.imperial.ac.uk/people/r.martin)^[Imperial College Business SChool  & Centre for Economic Perforamnce, LSE]** 
 
 Last update:  `r format(Sys.time(), '%B %d , %Y - %H:%M ')`
 
@@ -230,8 +230,8 @@ We see that hoaxers are significantly more obsessed with Trump, but the effect i
 
 # The consequences of memetic infections
 
-We examine if US state level hoax infection rates are correlated with reported covid19 infection rates. This is interesting to gauge if mis-information has any effect on actual outcomes. Clearly, from a simple exercise like that we cannot draw overly strong conclusions about causal effects. However, it is a useful starting point. 
-
+We examine if US state level hoax infection rates are correlated with reported covid19 infection rates. This is interesting to gauge if mis-information has any effect on actual outcomes. Clearly, from a simple exercise like that we cannot draw overly strong conclusions about causal effects. However, it is a useful starting point. Here we report regressions of per capita covid cases across US states on the share of hoax in total tweets along with various controls:
+<br/><br/>
 
 
 ```{r statelevel,echo=FALSE}
@@ -291,6 +291,7 @@ library(stargazer)
 stargazer(r1, r2, r3, type = "html")
 ```
 
+<br/><br/>
 
 As the regression table above shows we find a statistically significant positive relationship bewteen statelevel hoaxism and per capita covid cases. This is robust to the inclusion of obvious controls such as population, population density and general tweet triggerness of the population. The relationship is also relevant in terms of its size: 1 percentage point more hoax tweets lead to about one more covid patient per 1000 citizens.
 
