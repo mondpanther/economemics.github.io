@@ -2,15 +2,26 @@
 title: "Infections of the body and the mind"
 output: html_document
 css:    mondstyle.css
-html_document:
-    includes:
-       in_header: glytics.html
 editor_options: 
 chunk_output_type: inline
 
 ---
 
 **by [Julio Amador Diaz Lopez](https://www.imperial.ac.uk/people/j.amador)^[Imperial College Business School] and [Ralf Martin](https://www.imperial.ac.uk/people/r.martin)^[Imperial College Business SChool  & Centre for Economic Perforamnce, LSE]** 
+
+
+<!--html_preserve-->
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-3928947-4"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+  
+    gtag('config', 'UA-3928947-4');
+  </script>
+<!--/html_preserve-->
+
 
 Last update:  `r format(Sys.time(), '%B %d , %Y - %H:%M ')`
 
