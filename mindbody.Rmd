@@ -248,6 +248,9 @@ r4=lm(casesPC~hoaxsh*density+pop+tweetsPC,stats)
 
 
 
+#summary(lm(casesPC~hoaxsh+density,stats%>%filter(hoaxsh<.5 & casesPC<1)))
+#summary(lm(casesPC~hoaxsh+density,stats%>%filter(state!="New Jersey" & state!="New York")))
+
 #stats=stats%>%mutate(DD=  (r4$coefficients[["hoaxsh"]]+r4$coefficients[["hoaxsh:density"]]*density) *hoaxsh * pop/1000)
 stats=stats%>%mutate(DD=  (r3$coefficients[["hoaxsh"]]) *hoaxsh * pop/1000)
 #sum(stats$DD)
