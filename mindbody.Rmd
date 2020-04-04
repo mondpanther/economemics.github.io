@@ -2,8 +2,12 @@
 title: "Infections of the body and the mind"
 output: html_document
 css:    mondstyle.css
+html_document:
+    includes:
+       in_header: glytics.html
 editor_options: 
-  chunk_output_type: inline
+chunk_output_type: inline
+
 ---
 
 **by [Julio Amador Diaz Lopez](https://www.imperial.ac.uk/people/j.amador)^[Imperial College Business School] and [Ralf Martin](https://www.imperial.ac.uk/people/r.martin)^[Imperial College Business SChool  & Centre for Economic Perforamnce, LSE]** 
@@ -225,6 +229,7 @@ tr=lm(trumpid~hoaxer,ctexts)
 So both hoaxers and non hoaxers tweet a lot about Trump (besides covid19). But which of the two groups is more obsessed about Trump? 
 Analysis of the data suggests that Hoaxists mention Trump signficantly more but the effect is not very big: hoaxers have a  `r round(tr$coefficients[["hoaxerTRUE"]]*100,2) ` percentage point higher probability of mentioning Trump (The share of Trump mentions across both groups is `r round(mean(ctexts$trumpid)*100,2)`%).
 
+Note that the term "filmyourhospital" shows up prominently, which according [reports] (https://www.mediamatters.org/coronavirus-covid-19/coronavirus-denying-conspiracy-theory-hashtag-spreading-tiktok-infowars-host) is a hastag pushed by right-wing commentators.
 
 
 # The consequences of memetic infections
