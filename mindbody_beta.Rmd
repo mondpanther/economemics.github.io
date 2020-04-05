@@ -1,0 +1,344 @@
+---
+title: "Infections of the body and the mind"
+output: html_document
+css:    mondstyle.css
+editor_options: 
+chunk_output_type: inline
+
+---
+
+**by [Julio Amador Diaz Lopez](https://www.imperial.ac.uk/people/j.amador)^[Imperial College Business School] and [Ralf Martin](https://www.imperial.ac.uk/people/r.martin)^[Imperial College Business SChool  & Centre for Economic Perforamnce, LSE]** 
+
+
+<!--html_preserve-->
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-3928947-4"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+  
+    gtag('config', 'UA-3928947-4');
+  </script>
+<!--/html_preserve-->
+
+
+Last update:  `r format(Sys.time(), '%B %d , %Y - %H:%M ')`
+
+```{r Notes,eval=FALSE,include=FALSE}
+#We are using this: https://www.earthdatascience.org/courses/earth-analytics/get-data-using-apis/use-twitter-api-r/
+
+#This is useful too: https://rtweet.info/
+
+```
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(rtweet)
+library(tidytext)
+
+# plotting and pipes - tidyverse!
+library(ggplot2)
+library(dplyr)
+library(gdata)
+
+
+
+source("../code/gettoken.R")
+
+
+```
+
+
+
+
+
+```{r load ts data,include=FALSE}
+#`r ntweets'
+
+scomb=readRDS("../results/scomb.rda")
+
+ntweets= round(sum(scomb$tweets) /10^6,2)
+
+
+
+nhoax=sum(scomb$igtweets)
+
+```
+
+
+
+# Introduction
+
+
+The coronavirus pandemic has changed everything overnight. Unfortunately, as the genetic sequence of the virus started to make its deadly journey through bodies around the world, in parallel a memetic sequence emerged in the minds of some people: the idea that covid19 pandemic is not real and a hoax. Indeed, the worry is that the two infections exist in a symbiotic relationship with one helping to advance the survival and spread of the other. Here we report on our ongoing efforts to map the spread of memetic infection using Twitter. Since March 23 we have been sampling tweets mentioning the terms “corona” and/or “covid”. Currently, we have collected   `r ntweets` million  tweets.
+
+
+Some emerging results include the following:
+
+- There is no sign that hoax meme has run its course. Over our admittedly short sample period of about 10 days the overal share of hoax believer tweets has increased.
+- There is some evidence that Donald Trump has to answer for the hoax meme. Hoax believers are particularly obsessed with him.
+- There is evidence that believe in Hoax led to more higher covid cases than necessary. Across US states we find a strong correlation between hoax believer rates and covid cases. We have to be careful with causal interpretations but the numbers would imply that US covid cases could be about 2/3 lower in absence of hoaxism.
+
+
+
+
+# Hoaxism over time
+
+How bad is the hoax infection and is it getting better or worse? To identify tweeters believing in the hoax (or promoting the hoax idea) we look for tweets with one of the following hastags:
+
+- "#hoax"
+- "#coronahoax"
+- "#covidhoax"
+- "#chinesevirus"
+
+Using hashtags instead of string searches of the same terms provides a good distinction between tweets who display support for hoaxsim vs tweets criticising hoaxism. Note that this is likely a conservative way of counting hoaxist tweets and in reality a larger fraction of tweets are from people supporting hoaxist ideas.
+
+Below is a time series plot of the share of hoaxist tweets over our sample period. we report separate series for the Us and UK. Assigning location to tweets is notoriously difficult as most users have switch off detailed location tracking. In the figure below we base location on the analysis of a free text field where users can write something about their whereabouts. In many cases this refers to known areas although the detail varies (e.g. London, UK vs the Universe). Often it also involves phantasy locations (e.g. Walhalla). Hence, our "other" category might include tweeters from either the UK or Us who have chosen not to reveal their location.
+
+Note that towards the begining of the sample period the share of hoax tweets in all covid related tweets is less than 0.5%. However, the weekend  around the 28th of March saw a major outbreak of Hoaxism that was particularly bad in the UK. This has subsided somewhat come March 30. However, hoaxism levels remain higher than a week ago particularly in the UK.
+
+```{r tsplot,echo=FALSE}
+tsplot=ggplot(scomb, aes(x = date,y=hoaxsh,color=country  )  )+geom_point() +  geom_line() + theme_minimal() + xlab("Time") +ylab("Share of hoax tweets [%]")
+
+tsplot
+```
+
+
+```{r, echo=FALSE}
+scomb=scomb%>%group_by(date) %>% summarise(tot=sum(tweets)) %>% merge(scomb,by="date") %>% mutate(totsh=tweets/tot *100)
+tsp2=ggplot(scomb, aes(x = date,y=totsh,color=country  )  )+geom_point() +  geom_line() + theme_minimal() + xlab("Time") +ylab("Share in %")
+
+#tsp2
+```
+
+
+
+
+
+
+
+
+
+
+# What else are hoaxers tweeting about?
+
+
+```{r wordclouds,include=FALSE, echo=FALSE}
+
+#tmls['ccid'] <-     mapply(grepl, pattern="climate", x=tolower(tmls$text) )
+#tmls['trumpid'] <-  mapply(grepl, pattern="trump", x=tolower(tmls$text) )
+#tmls['clintonid'] <-  mapply(grepl, pattern="clinton", x=tolower(tmls$text) )  
+#tmls['coronaORcovid'] <-     mapply(grepl, pattern="corona", x=tolower(tmls$text) ) |  mapply(grepl, pattern="covid", x=tolower(tmls$text) )
+#summary(tmls$trumpid)
+#summary(tmls$clintonid)
+#summary(tmls$coronaORcovid)
+#cc=tmls%>%filter(ccid==TRUE)
+#nrow(tmls%>%filter(ccid==TRUE))
+
+library(tm)
+
+
+
+tmls=readRDS("../results/tmls.rda")
+tmlsnon=readRDS("../results/tmlsnon.rda")
+
+
+texts=tmls[,c('status_id','text')]
+
+
+texts=texts%>%dplyr::rename(doc_id=status_id)
+
+
+textsref=tmlsnon[,c('status_id','text')]
+textsref=textsref%>%dplyr::rename(doc_id=status_id)
+
+
+
+
+
+
+#install.packages("wordcloud")
+library(wordcloud)
+#install.packages("RColorBrewer")
+library(RColorBrewer)
+#install.packages("wordcloud2")
+library(wordcloud2)
+
+
+wc=function(texts){
+  
+    texts$text=gsub("más", "", texts$text)
+    texts$text=gsub("https\\S*", "", texts$text)
+    texts$text=gsub("@\\S*", ""    , texts$text)
+    texts$text=gsub("amp", "", texts$text) 
+    texts$text=gsub("[\r\n]", "", texts$text)
+    texts$text=gsub("[[:punct:]]", "", texts$text)
+  
+    
+    
+    docs=Corpus(DataframeSource(texts))
+    docs <- docs %>%
+      tm_map(removeNumbers) %>%
+      tm_map(removePunctuation) %>%
+      tm_map(stripWhitespace)
+    
+    docs <- tm_map(docs, content_transformer(tolower))
+    docs <- tm_map(docs, removeWords, stopwords("english"))
+    
+    dtm <- TermDocumentMatrix(docs) 
+    matrix <- as.matrix(dtm) 
+    words <- sort(rowSums(matrix),decreasing=TRUE) 
+    df <- data.frame(word = names(words),freq=words)
+    
+    
+    set.seed(1234) # for reproducibility 
+    wordcloud(words = df$word, freq = df$freq, min.freq = 1,       max.words=100, random.order=FALSE, rot.per=0.2,                colors=brewer.pal(8, "Dark2"))
+}
+```
+
+Here is a word cloud of the last 500 tweets of the 100 most prolific hoax believers. 
+```{r wordcloudsregs, echo=FALSE}
+
+wc(texts)
+#names(combstream)
+#textsref=subset(comb, select = c(status_id,text))
+#textsref=textsref%>%rename(doc_id=status_id)
+```
+
+For comparison, here is a word cloud of the 100 most prolific non-hoax believing tweeters.
+```{r nonhoaxer,echo=FALSE}
+wc(textsref)
+
+
+```
+
+
+
+```{r,echo=FALSE}
+
+texts['hoaxer']=TRUE
+textsref['hoaxer']=FALSE
+
+
+ctexts=rbind(texts,textsref)
+
+
+ctexts['trumpid'] <-  mapply(grepl, pattern="trump", x=tolower(ctexts$text) )
+
+
+
+
+
+
+tr=lm(trumpid~hoaxer,ctexts)
+#summary(tr)
+
+```
+So both hoaxers and non hoaxers tweet a lot about Trump (besides covid19). But which of the two groups is more obsessed about Trump? 
+Analysis of the data suggests that Hoaxists mention Trump signficantly more but the effect is not very big: hoaxers have a  `r round(tr$coefficients[["hoaxerTRUE"]]*100,2) ` percentage point higher probability of mentioning Trump (The share of Trump mentions across both groups is `r round(mean(ctexts$trumpid)*100,2)`%).
+
+Note that the term "filmyourhospital" shows up prominently, which according [reports] (https://www.mediamatters.org/coronavirus-covid-19/coronavirus-denying-conspiracy-theory-hashtag-spreading-tiktok-infowars-host) is a hastag pushed by right-wing commentators.
+
+
+# The consequences of memetic infections
+
+We examine if US state level hoax infection rates are correlated with reported covid19 infection rates. This is interesting to gauge if mis-information has any effect on actual outcomes. Clearly, from a simple exercise like that we cannot draw overly strong conclusions about causal effects. However, it is a useful starting point. Here we report regressions of per capita covid cases across US states on the share of hoax in total tweets along with various controls:
+<br/><br/>
+
+
+```{r statelevel,echo=FALSE}
+
+
+
+stats=readRDS("../results/stats.Rda")
+
+r1=lm(casesPC~hoaxsh,stats)
+r2=lm(casesPC~hoaxsh+density+pop,stats)
+
+
+r3=lm(casesPC~hoaxsh+density+pop+tweetsPC,stats)
+r4=lm(casesPC~hoaxsh*density+pop+tweetsPC,stats)
+
+
+
+#summary(lm(casesPC~hoaxsh+density,stats%>%filter(hoaxsh<.5 & casesPC<1)))
+#summary(lm(casesPC~hoaxsh+density,stats%>%filter(state!="New Jersey" & state!="New York")))
+
+#stats=stats%>%mutate(DD=  (r4$coefficients[["hoaxsh"]]+r4$coefficients[["hoaxsh:density"]]*density) *hoaxsh * pop/1000)
+stats=stats%>%mutate(DD=  (r3$coefficients[["hoaxsh"]]) *hoaxsh * pop/1000)
+#sum(stats$DD)
+#sum(stats$cases)
+
+
+#sum(stats$DD)
+#sum(stats$cases)
+
+#summary(r1)
+#summary(r2)
+#summary(r3)
+#summary(r4)
+
+sss=stats%>%summarise(pop=sum(pop),cases=sum(cases), tweets=sum(tweets),hoax=sum(hoax))
+sss=sss%>% mutate(hoaxsh=hoax/tweets*100,casesPC=cases/pop*1000)
+sss=sss%>% mutate(saved=r2$coefficients[["hoaxsh"]]*hoaxsh*pop/1000)
+
+
+coef=r3$coefficients[["hoaxsh"]]
+
+
+
+stats=stats%>% mutate(saved=coef*hoaxsh*pop/1000)
+
+#look=stats%>% select(c(hoaxsh,saved,casesPC))
+#View(look)
+saved=base::sum(stats$saved)
+all=base::sum(stats$cases)
+
+
+#summary(lm(casesPC~hoaxsh+density,stats))
+#summary(lm(casesPC~hoaxsh+density+tweetsPC,stats))
+```
+
+
+```{r  message=FALSE, results='asis',echo=FALSE} 
+library(stargazer)
+
+stargazer(r1, r2, r3, type = "html")
+```
+
+<br/><br/>
+
+As the regression table above shows we find a statistically significant positive relationship bewteen statelevel hoaxism and per capita covid cases. This is robust to the inclusion of obvious controls such as population, population density and general tweet triggerness of the population. The relationship is also relevant in terms of its size: 1 percentage point more hoax tweets lead to about one more covid patient per 1000 citizens.
+
+This would imply that in without hoaxism as of March 31 we would have  `r format(saved,scientific=FALSE)` covid cases less (of `r format(all,scientific=FALSE)`).
+
+
+
+Here is a scatter plot of covid cases (per capita) on memetic infection rates. Clearly, much depends on New York. However, it is particularly interesting to contrast New York and New Jersey. Both are geographically close and have similar population density. Covid cases in New Jersey are however dramatically lower (abeit still high). What accounts for the difference? Well, one difference are substantially lower rates of Hoaxism in New Jersey.
+
+```{r,  echo=FALSE}
+library(ggrepel)
+ggplot(stats) + 
+    aes(y=casesPC, x=hoaxsh,label=state) +
+    geom_point() +geom_text_repel(cex=2)+
+    stat_smooth(method = "lm", se = FALSE)+theme_minimal()+ylab("Covid Cases per 1000")+xlab("Share of hoax tweets in %")
+
+
+```
+
+
+
+For comparison we also plot the scatter plot of covid cases on population density.
+```{r,  echo=FALSE}
+library(ggrepel)
+ggplot(stats) + 
+    aes(y=casesPC, x=density,label=state) +
+    geom_point() +geom_text_repel(cex=2)+
+    stat_smooth(method = "lm", se = FALSE)+theme_minimal()+ylab("Covid Cases per 1000")+xlab("Density")
+
+
+```
+
