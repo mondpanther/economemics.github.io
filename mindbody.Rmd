@@ -240,7 +240,7 @@ tr=lm(trumpid~hoaxer,ctexts)
 So both hoaxers and non hoaxers tweet a lot about Trump (besides covid19). But which of the two groups is more obsessed about Trump? 
 Analysis of the data suggests that Hoaxists mention Trump signficantly more but the effect is not very big: hoaxers have a  `r round(tr$coefficients[["hoaxerTRUE"]]*100,2) ` percentage point higher probability of mentioning Trump (The share of Trump mentions across both groups is `r round(mean(ctexts$trumpid)*100,2)`%).
 
-Note that the term "filmyourhospital" shows up prominently, which according [reports] (https://www.mediamatters.org/coronavirus-covid-19/coronavirus-denying-conspiracy-theory-hashtag-spreading-tiktok-infowars-host) is a hastag pushed by right-wing commentators.
+Note that the term "filmyourhospital" shows up prominently, which according [reports](https://www.mediamatters.org/coronavirus-covid-19/coronavirus-denying-conspiracy-theory-hashtag-spreading-tiktok-infowars-host) is a hastag pushed by right-wing commentators.
 
 
 # The consequences of memetic infections
@@ -264,7 +264,7 @@ r4=lm(casesPC~hoaxsh*density+pop+tweetsPC,stats)
 
 
 
-#summary(lm(casesPC~hoaxsh+density,stats%>%filter(hoaxsh<.5 & casesPC<1)))
+#summary(lm(casesPC~hoaxsh+density,stats%>%filter(hoaxsh<7 & casesPC<10)))
 #summary(lm(casesPC~hoaxsh+density,stats%>%filter(state!="New Jersey" & state!="New York")))
 
 #stats=stats%>%mutate(DD=  (r4$coefficients[["hoaxsh"]]+r4$coefficients[["hoaxsh:density"]]*density) *hoaxsh * pop/1000)
@@ -311,9 +311,9 @@ stargazer(r1, r2, r3, type = "html")
 
 <br/><br/>
 
-As the regression table above shows we find a statistically significant positive relationship bewteen statelevel hoaxism and per capita covid cases. This is robust to the inclusion of obvious controls such as population, population density and general tweet triggerness of the population. The relationship is also relevant in terms of its size: 1 percentage point more hoax tweets lead to about one more covid patient per 1000 citizens.
+As the regression table above shows we find a statistically significant positive relationship bewteen statelevel hoaxism and per capita covid cases. This is robust to the inclusion of obvious controls such as population, population density and general tweet triggerness of the population. The relationship is also relevant in terms of its size: 1 percentage point more hoax tweets lead to more than 1.5 extra covid patients per 1000 citizens.
 
-This would imply that in without hoaxism as of March 31 we would have  `r format(saved,scientific=FALSE)` covid cases less (of `r format(all,scientific=FALSE)`).
+This would imply that without hoaxism as of `r max(stats$date)` we would have  `r format(saved,scientific=FALSE)` covid cases less (of `r format(all,scientific=FALSE)`).
 
 
 
