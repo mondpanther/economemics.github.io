@@ -171,7 +171,14 @@ library(wordcloud2)
 
 
 wc=function(texts){
-  
+    texts$text=gsub(" re ", " ", texts$text)
+    texts$text=gsub("untuk", " ", texts$text)
+    texts$text=gsub("uuuuuu", " ", texts$text)
+    texts$text=gsub("uuuuu", " ", texts$text)
+    texts$text=gsub("uuuu", " ", texts$text)
+    texts$text=gsub("uuu", " ", texts$text)
+    texts$text=gsub("uue", " ", texts$text)
+    texts$text=gsub("uu", " ", texts$text)
     texts$text=gsub("más", "", texts$text)
     texts$text=gsub("https\\S*", "", texts$text)
     texts$text=gsub("@\\S*", ""    , texts$text)
@@ -201,7 +208,7 @@ wc=function(texts){
 }
 ```
 
-Here is a word cloud of the last 1000 tweets of the 200 most prolific hoax believers. 
+Here is a word cloud of the last 1000 tweets of the 300 most prolific hoax believers. 
 ```{r wordcloudsregs, echo=FALSE}
 
 wc(texts)
@@ -210,7 +217,7 @@ wc(texts)
 #textsref=textsref%>%rename(doc_id=status_id)
 ```
 
-For comparison, here is a word cloud of the 300 most prolific non-hoax believing tweeters.
+For comparison, here is a word cloud of the 300 most prolific non-hoaxist covid related tweeters.
 ```{r nonhoaxer,echo=FALSE}
 wc(textsref)
 
@@ -250,12 +257,6 @@ Also note that the term "filmyourhospital" shows up prominently, which according
 We examine if US state level hoax infection rates are correlated with reported covid19 infection rates. This is interesting to gauge if mis-information has any effect on actual outcomes. Clearly, from a simple exercise like that we cannot draw overly strong conclusions about causal effects. However, it is a useful starting point. 
 The figure below is a scatter plot of state level per capita infection rates on the share of hoax tweets (in percent) from within the state. There is clearly a positive relationship. What is particularly striking is that New York is not only extreme in terms of infections but also in the prevalenc of hoaxism.
 
-
-
-
-
-
-Here we report regressions of per capita covid cases across US states on the share of hoax in total tweets along with various controls:
 <br/><br/>
 
 
@@ -386,14 +387,14 @@ ggplot(stats) +
 
 To explore this more below we also undertake regression analysis. The Table below shows that:
 
-- Hoaxsim is indeed significantly and positively related to hoaxism (Column 1). The coefficient implies that a 1 percentage point higher hoaxism level is associated with than 1.86 extra covid patients per 1000 citizens.
+- Hoaxsim is indeed significantly and positively related to hoaxism (Column 1). The coefficient implies that a 1 percentage point higher hoaxism level is associated with 0.822 extra covid patients per 1000 citizens.
 
 - This is result is highly robust to the inclusion of further controls such as population density, population size and covid tweet intensity (covid related tweets per 1000 people) in column 2. 
 
 - The hoaxism and density interaction hypothesis is confirmed in column 3 where we include the interaction of both variables as an additional regression coefficient. In column 4, drop New York from the sample. The interaction hypothesis is robust to that.
 
 
-We have to be cautious with causal claims at this stage. Our results could be contingent on our  simple model specification or crude aggregation (e.g. we don't take into account that New York state consists of the metropolitian area of New York as well as rarther rural parts). Still, to understand if the results are not only statistically significant but also quantitatively meaningful it is useful to ask what - if taken at face value - the impact of haoxism would be. Using the estimates from column 4 would then imply that without hoaxism  we would have  `r format(saved,scientific=FALSE)` covid cases less (of `r format(all,scientific=FALSE)`), as of `r max(stats$date)`. Clearly, this is substantial.
+We have to be cautious with causal claims at this stage. Our results could be contingent on our  simple model specification or crude aggregation (e.g. we don't take into account that New York state consists of the metropolitian area of New York as well as rarther rural parts). Still, to understand if the results are not only statistically significant but also quantitatively meaningful it is useful to ask what - if taken at face value - the impact of haoxism would be. Using the estimates from column 4 would imply that without hoaxism  we had  `r format(saved,scientific=FALSE)` covid cases less (of `r format(all,scientific=FALSE)`), as of `r max(stats$date)`. Clearly, this is substantial.
 
 <br/><br/>
 
