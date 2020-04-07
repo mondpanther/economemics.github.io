@@ -98,7 +98,7 @@ Using hashtags instead of string searches of the same terms provides a good dist
 
 Below is a time series plot of the share of hoaxist tweets over our sample period. we report separate series for the Us and UK. Assigning location to tweets is notoriously difficult as most users have switch off detailed location tracking. In the figure below we base location on the analysis of a free text field where users can write something about their whereabouts. In many cases this refers to known areas although the detail varies (e.g. London, UK vs the Universe). Often it also involves phantasy locations (e.g. Walhalla). Hence, our "other" category might include tweeters from either the UK or Us who have chosen not to reveal their location.
 
-Note that towards the begining of the sample period the share of hoax tweets in all covid related tweets is less than 0.5%. However, the weekend  around the 28th of March saw a major outbreak of Hoaxism that was particularly bad in the UK. This has subsided somewhat come March 30. However, hoaxism levels remain higher than a week ago particularly in the UK.
+Note that towards the begining of the sample period the share of hoax tweets in all covid related tweets is less than 0.5%. However, the weekend  around the 28th of March saw a major outbreak of Hoaxism that was particularly bad in the UK. This has subsided somewhat come March 30. However, hoaxism levels remain higher than 2 weeks ago particularly in the UK.
 
 ```{r tsplot,echo=FALSE}
 tsplot=ggplot(scomb, aes(x = date,y=hoaxsh,color=country  )  )+geom_point() +  geom_line() + theme_minimal() + xlab("Time") +ylab("Share of hoax tweets [%]")
@@ -199,7 +199,7 @@ wc=function(texts){
 }
 ```
 
-Here is a word cloud of the last 500 tweets of the 100 most prolific hoax believers. 
+Here is a word cloud of the last 500 tweets of the 500 most prolific hoax believers. 
 ```{r wordcloudsregs, echo=FALSE}
 
 wc(texts)
@@ -208,7 +208,7 @@ wc(texts)
 #textsref=textsref%>%rename(doc_id=status_id)
 ```
 
-For comparison, here is a word cloud of the 100 most prolific non-hoax believing tweeters.
+For comparison, here is a word cloud of the 500 most prolific non-hoax believing tweeters.
 ```{r nonhoaxer,echo=FALSE}
 wc(textsref)
 
@@ -237,16 +237,36 @@ tr=lm(trumpid~hoaxer,ctexts)
 #summary(tr)
 
 ```
-So both hoaxers and non hoaxers tweet a lot about Trump (besides covid19). But which of the two groups is more obsessed about Trump? 
+So both hoaxers and non hoaxers tweet a lot about Trump (besides covid19). Of course on group might mention him in suppor whereas the other group mention him to critisize him. We will explore thie in future work. For now let's examine  which of the two groups is more obsessed about Trump? 
 Analysis of the data suggests that Hoaxists mention Trump signficantly more but the effect is not very big: hoaxers have a  `r round(tr$coefficients[["hoaxerTRUE"]]*100,2) ` percentage point higher probability of mentioning Trump (The share of Trump mentions across both groups is `r round(mean(ctexts$trumpid)*100,2)`%).
 
-Note that the term "filmyourhospital" shows up prominently, which according [reports](https://www.mediamatters.org/coronavirus-covid-19/coronavirus-denying-conspiracy-theory-hashtag-spreading-tiktok-infowars-host) is a hastag pushed by right-wing commentators.
+Also note that the term "filmyourhospital" shows up prominently, which according [reports](https://www.mediamatters.org/coronavirus-covid-19/coronavirus-denying-conspiracy-theory-hashtag-spreading-tiktok-infowars-host) is a hastag pushed by right-wing commentators.
 
 
 # The consequences of memetic infections
 
-We examine if US state level hoax infection rates are correlated with reported covid19 infection rates. This is interesting to gauge if mis-information has any effect on actual outcomes. Clearly, from a simple exercise like that we cannot draw overly strong conclusions about causal effects. However, it is a useful starting point. Here we report regressions of per capita covid cases across US states on the share of hoax in total tweets along with various controls:
+We examine if US state level hoax infection rates are correlated with reported covid19 infection rates. This is interesting to gauge if mis-information has any effect on actual outcomes. Clearly, from a simple exercise like that we cannot draw overly strong conclusions about causal effects. However, it is a useful starting point. 
+The figure below is a scatter plot of state level per capita infection rates on the share of hoax tweets (in percent) from within the state. There is clearly a positive relationship. What is particularly striking is that New York is not only extreme in terms of infections but also in the prevalenc of hoaxism.
+
+
+
+
+
+
+Here we report regressions of per capita covid cases across US states on the share of hoax in total tweets along with various controls:
 <br/><br/>
+
+
+```{r, echo=FALSE}
+#https://rstudio-pubs-static.s3.amazonaws.com/265609_47fe3e17b8ec4e4792340624f55b3544.html
+
+#```{r sampleani, fig.show='animate', fig.width=4, fig.height=4, cache=FALSE, interval=0.05, aniopts="controls,loop"}
+#for (i in 1:50) {
+#    plot(x=i/10, y=i/10, xlim=c(0,6), ylim=c(0,6), pch=20, col=palette()[2], cex=5)
+#}
+
+```
+
 
 
 ```{r statelevel,echo=FALSE}
@@ -254,6 +274,7 @@ We examine if US state level hoax infection rates are correlated with reported c
 
 
 stats=readRDS("../results/stats.Rda")
+stats=stats%>%mutate(pop=pop/1000)
 
 r1=lm(casesPC~hoaxsh,stats)
 r2=lm(casesPC~hoaxsh+density+pop,stats)
@@ -261,14 +282,15 @@ r2=lm(casesPC~hoaxsh+density+pop,stats)
 
 r3=lm(casesPC~hoaxsh+density+pop+tweetsPC,stats)
 r4=lm(casesPC~hoaxsh*density+pop+tweetsPC,stats)
+r5=lm(casesPC~hoaxsh*density+pop+tweetsPC,stats%>%filter(state!="New York"))
 
 
 
 #summary(lm(casesPC~hoaxsh+density,stats%>%filter(hoaxsh<7 & casesPC<10)))
 #summary(lm(casesPC~hoaxsh+density,stats%>%filter(state!="New Jersey" & state!="New York")))
 
-#stats=stats%>%mutate(DD=  (r4$coefficients[["hoaxsh"]]+r4$coefficients[["hoaxsh:density"]]*density) *hoaxsh * pop/1000)
-stats=stats%>%mutate(DD=  (r3$coefficients[["hoaxsh"]]) *hoaxsh * pop/1000)
+#stats=stats%>%mutate(DD=  (r4$coefficients[["hoaxsh"]]+r4$coefficients[["hoaxsh:density"]] * density ) *hoaxsh * pop/1000)
+#stats=stats%>%mutate(DD=  (r3$coefficients[["hoaxsh"]]) *hoaxsh * pop)
 #sum(stats$DD)
 #sum(stats$cases)
 
@@ -282,42 +304,49 @@ stats=stats%>%mutate(DD=  (r3$coefficients[["hoaxsh"]]) *hoaxsh * pop/1000)
 #summary(r4)
 
 sss=stats%>%summarise(pop=sum(pop),cases=sum(cases), tweets=sum(tweets),hoax=sum(hoax))
-sss=sss%>% mutate(hoaxsh=hoax/tweets*100,casesPC=cases/pop*1000)
-sss=sss%>% mutate(saved=r2$coefficients[["hoaxsh"]]*hoaxsh*pop/1000)
+sss=sss%>% mutate(hoaxsh=hoax/tweets*100,casesPC=cases/pop)
+#sss=sss%>% mutate(saved=(r4$coefficients[["hoaxsh"]]+r4$coefficients[["hoaxsh:density"]] * density ) * hoaxsh  *  pop)
 
 
 coef=r3$coefficients[["hoaxsh"]]
 
 
+#stats=stats%>% mutate(saved=(r3$coefficients[["hoaxsh"]]) * hoaxsh  *  pop)
+#stats=stats%>% mutate(saved=(r4$coefficients[["hoaxsh"]]+r4$coefficients[["hoaxsh:density"]] * density ) * hoaxsh  *  pop)
+stats=stats%>% mutate(saved=(r5$coefficients[["hoaxsh"]]+r5$coefficients[["hoaxsh:density"]] * density ) * hoaxsh  *  pop)
 
-stats=stats%>% mutate(saved=coef*hoaxsh*pop/1000)
+
+
+stats=stats%>% mutate(saved=ifelse(saved>cases, cases,saved))
+
+#summary(stats$saved)
 
 #look=stats%>% select(c(hoaxsh,saved,casesPC))
 #View(look)
+
+
+stats=stats%>%mutate(hoaxsh2=hoaxsh^2,density2=density^2)
 saved=base::sum(stats$saved)
 all=base::sum(stats$cases)
 
 
 #summary(lm(casesPC~hoaxsh+density,stats))
-#summary(lm(casesPC~hoaxsh+density+tweetsPC,stats))
-```
+#summary(lm(casesPC~hoaxsh*density+tweetsPC,stats))
+#summary(lm(casesPC~hoaxsh*density+tweetsPC+pop,stats))
+#summary(lm(casesPC~hoaxsh*density+tweetsPC+pop,stats))
 
 
-```{r  message=FALSE, results='asis',echo=FALSE} 
-library(stargazer)
+#summary(lm(log(casesPC)~hoaxsh*density+tweetsPC+pop,stats))
+#summary(lm(casesPC~density+tweetsPC,stats))
+#summary(lm(casesPC~hoaxsh*density+pop+tweetsPC+density2+hoaxsh2,stats%>%filter(state!="New York")))
+#summary(lm(casesPC~hoaxsh+density+pop+tweetsPC,stats%>%filter(state!="New York")))
 
-stargazer(r1, r2, r3, type = "html")
+#summary(lm(casesPC~hoaxsh+density+tweetsPC,stats%>%filter(state!="New York")))
 ```
 
 <br/><br/>
 
-As the regression table above shows we find a statistically significant positive relationship bewteen statelevel hoaxism and per capita covid cases. This is robust to the inclusion of obvious controls such as population, population density and general tweet triggerness of the population. The relationship is also relevant in terms of its size: 1 percentage point more hoax tweets lead to more than 1.5 extra covid patients per 1000 citizens.
 
-This would imply that without hoaxism as of `r max(stats$date)` we would have  `r format(saved,scientific=FALSE)` covid cases less (of `r format(all,scientific=FALSE)`).
-
-
-
-Here is a scatter plot of covid cases (per capita) on memetic infection rates. Clearly, much depends on New York. However, it is particularly interesting to contrast New York and New Jersey. Both are geographically close and have similar population density. Covid cases in New Jersey are however dramatically lower (abeit still high). What accounts for the difference? Well, one difference are substantially lower rates of Hoaxism in New Jersey.
 
 ```{r,  echo=FALSE}
 library(ggrepel)
@@ -329,16 +358,49 @@ ggplot(stats) +
 
 ```
 
+<br/><br/>
+
+An alternative explanation for the striking infection rates in New York is the relative density of New York. That's why we also examine the relationship between infection rates and density (in people per square mile). Indeed there is a positive relationship as well. But New York seems to be more of an outlier in terms of density. 
+Indeed one potential hypothesis the two figures combined suggests is that there might be an interaction effect between hoaxism and density. Take for instance Alaska, which has the second highest rates of hoaxism, but much lower infection rates than New York. Of course it's also the least densiley populated state. On the other hand: consider New Jersey which is actually more dense than New York but has much lower rates of infection. It turns out that hoaxism is also less prevalent there.
 
 
-For comparison we also plot the scatter plot of covid cases on population density.
+
+<br/><br/>
+
+
 ```{r,  echo=FALSE}
 library(ggrepel)
 ggplot(stats) + 
     aes(y=casesPC, x=density,label=state) +
     geom_point() +geom_text_repel(cex=2)+
-    stat_smooth(method = "lm", se = FALSE)+theme_minimal()+ylab("Covid Cases per 1000")+xlab("Density")
+    stat_smooth(method = "lm", se = FALSE)+theme_minimal()+ylab("Covid Cases per 1000")+xlab("Density [People per square mile]")
 
 
 ```
+
+
+<br/><br/>
+
+
+To explore this more below we also undertake regression analysis. The Table below shows that:
+
+- Hoaxsim is indeed significantly and positively related to hoaxism (Column 1). The coefficient implies that a 1 percentage point higher hoaxism level is associated with than 1.86 extra covid patients per 1000 citizens.
+
+- This is result is highly robust to the inclusion of further controls such as population density, population size and covid tweet intensity (covid related tweets per 1000 people) in column 2. 
+
+- The hoaxism and density interaction hypothesis is confirmed in column 3 where we include the interaction of both variables as an additional regression coefficient. In column 4, drop New York from the sample. The interaction hypothesis is robust to that.
+
+
+We have to be cautious with causal claims at this stage. Our results could be contingent on our  simple model specification or crude aggregation (e.g. we don't take into account that New York state consists of the metropolitian area of New York as well as rarther rural parts). Still, to understand if the results are not only statistically significant but also quantitatively meaningful it is useful to ask what - if taken at face value - the impact of haoxism would be. Using the estimates from column 4 would then imply that without hoaxism  we would have  `r format(saved,scientific=FALSE)` covid cases less (of `r format(all,scientific=FALSE)`), as of `r max(stats$date)`. Clearly, this is substantial.
+
+<br/><br/>
+
+
+```{r  message=FALSE, results='asis',echo=FALSE} 
+library(stargazer)
+
+stargazer(r1,  r3,r4,r5, type = "html")
+```
+
+<br/><br/>
 
