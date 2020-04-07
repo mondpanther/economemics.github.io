@@ -7,7 +7,7 @@ chunk_output_type: inline
 
 ---
 
-**by [Julio Amador Diaz Lopez](https://www.imperial.ac.uk/people/j.amador)^[Imperial College Business School] and [Ralf Martin](https://www.imperial.ac.uk/people/r.martin)^[Imperial College Business SChool  & Centre for Economic Perforamnce, LSE]** 
+**by [Julio Amador Diaz Lopez](https://www.imperial.ac.uk/people/j.amador)^[Imperial College Business School] and [Ralf Martin](https://www.imperial.ac.uk/people/r.martin)^[Imperial College Business School  & Centre for Economic Perforamnce, LSE]** 
 
 
 <!--html_preserve-->
@@ -78,9 +78,11 @@ The coronavirus pandemic has changed everything overnight. Unfortunately, as the
 
 Some emerging results include the following:
 
-- There is no sign that hoax meme has run its course. Over our admittedly short sample period of about 10 days the overal share of hoax believer tweets has increased.
+- There is no sign that hoax meme has run its course. Over our admittedly short sample period of about two weeks the overal share of hoax believer remained stable.
 - There is some evidence that Donald Trump has to answer for the hoax meme. Hoax believers are particularly obsessed with him.
-- There is evidence that believe in Hoax led to more higher covid cases than necessary. Across US states we find a strong correlation between hoax believer rates and covid cases. We have to be careful with causal interpretations but the numbers would imply that US covid cases could be about 2/3 lower in absence of hoaxism.
+- There is evidence that believe in Hoax led to more higher covid cases than necessary. Across US states we find a strong correlation between hoax believer rates and covid cases. 
+- We have evidence that is consistent with the idea that interaction between population density and hoaxism is a major factor in explaining the severety of the pandemic.
+- We have to be careful with causal interpretations but the numbers would imply that US covid cases could be about 50% lower in absence of hoaxism.
 
 
 
@@ -98,7 +100,7 @@ Using hashtags instead of string searches of the same terms provides a good dist
 
 Below is a time series plot of the share of hoaxist tweets over our sample period. we report separate series for the Us and UK. Assigning location to tweets is notoriously difficult as most users have switch off detailed location tracking. In the figure below we base location on the analysis of a free text field where users can write something about their whereabouts. In many cases this refers to known areas although the detail varies (e.g. London, UK vs the Universe). Often it also involves phantasy locations (e.g. Walhalla). Hence, our "other" category might include tweeters from either the UK or Us who have chosen not to reveal their location.
 
-Note that towards the begining of the sample period the share of hoax tweets in all covid related tweets is less than 0.5%. However, the weekend  around the 28th of March saw a major outbreak of Hoaxism that was particularly bad in the UK. This has subsided somewhat come March 30. However, hoaxism levels remain higher than 2 weeks ago particularly in the UK.
+Note that towards the begining of the sample period the share of hoax tweets in all covid related tweets is less than 0.5%. However, the weekend  around the 28th of March saw a major outbreak of Hoaxism that was particularly bad in the UK. This has subsided somewhat come March 30. The whole sample trend would suggest that hoaxism is fairly stable and not subsiding.
 
 ```{r tsplot,echo=FALSE}
 tsplot=ggplot(scomb, aes(x = date,y=hoaxsh,color=country  )  )+geom_point() +  geom_line() + theme_minimal() + xlab("Time") +ylab("Share of hoax tweets [%]")
@@ -199,7 +201,7 @@ wc=function(texts){
 }
 ```
 
-Here is a word cloud of the last 500 tweets of the 500 most prolific hoax believers. 
+Here is a word cloud of the last 1000 tweets of the 200 most prolific hoax believers. 
 ```{r wordcloudsregs, echo=FALSE}
 
 wc(texts)
@@ -208,7 +210,7 @@ wc(texts)
 #textsref=textsref%>%rename(doc_id=status_id)
 ```
 
-For comparison, here is a word cloud of the 500 most prolific non-hoax believing tweeters.
+For comparison, here is a word cloud of the 300 most prolific non-hoax believing tweeters.
 ```{r nonhoaxer,echo=FALSE}
 wc(textsref)
 
@@ -237,8 +239,8 @@ tr=lm(trumpid~hoaxer,ctexts)
 #summary(tr)
 
 ```
-So both hoaxers and non hoaxers tweet a lot about Trump (besides covid19). Of course on group might mention him in suppor whereas the other group mention him to critisize him. We will explore thie in future work. For now let's examine  which of the two groups is more obsessed about Trump? 
-Analysis of the data suggests that Hoaxists mention Trump signficantly more but the effect is not very big: hoaxers have a  `r round(tr$coefficients[["hoaxerTRUE"]]*100,2) ` percentage point higher probability of mentioning Trump (The share of Trump mentions across both groups is `r round(mean(ctexts$trumpid)*100,2)`%).
+So both hoaxers and non hoaxers tweet a lot about Trump (besides covid19). Of course hoaxist might mention him in support whereas others might critisize him. We will explore this in future work. For now let's examine  which of the two groups is more obsessed about Trump? 
+Analysis of the data suggests that Hoaxists mention Trump signficantly more: hoaxers have a  `r round(tr$coefficients[["hoaxerTRUE"]]*100,2) ` percentage point higher probability of mentioning Trump (The share of Trump mentions across both groups is `r round(mean(ctexts$trumpid)*100,2)`%).
 
 Also note that the term "filmyourhospital" shows up prominently, which according [reports](https://www.mediamatters.org/coronavirus-covid-19/coronavirus-denying-conspiracy-theory-hashtag-spreading-tiktok-infowars-host) is a hastag pushed by right-wing commentators.
 
