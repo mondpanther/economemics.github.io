@@ -78,7 +78,7 @@ The coronavirus pandemic has changed everything overnight. Unfortunately, as the
 
 Some emerging results include the following:
 
-- There is no sign that hoax meme has run its course. Over our admittedly short sample period of about two weeks the overal share of hoax believer remained stable.
+- There is no sign that hoax meme has run its course. Over our admittedly short sample period of about two weeks the overal level of hoaxism remained stable.
 - There is some evidence that Donald Trump has to answer for the hoax meme. Hoax believers are particularly obsessed with him.
 - There is evidence that believe in Hoax led to more higher covid cases than necessary. Across US states we find a strong correlation between hoax believer rates and covid cases. 
 - We have evidence that is consistent with the idea that interaction between population density and hoaxism is a major factor in explaining the severety of the pandemic.
@@ -125,8 +125,9 @@ tsp2=ggplot(scomb, aes(x = date,y=totsh,color=country  )  )+geom_point() +  geom
 
 
 
-# What else are hoaxers tweeting about?
+# Why hoaxism?
 
+What are drives hoaxism? We can start exploring this by looking at the tweets of hoaxists more widely. Below we plot a word cloud of the last 1000 tweets of the 300 most prolific hoaxists. One hypothesis is that hoaxism has been fueled by Trumpism. Because of worries that a strong response to the pandemic could negatively affect the economy and thereby his re-election chances, he had a vested interest in playing down the crisis. The word cloud confirms that obsession with trump is prevalent among hoxists.
 
 ```{r wordclouds,include=FALSE, echo=FALSE}
 
@@ -208,7 +209,7 @@ wc=function(texts){
 }
 ```
 
-Here is a word cloud of the last 1000 tweets of the 300 most prolific hoax believers. 
+
 ```{r wordcloudsregs, echo=FALSE}
 
 wc(texts)
@@ -217,12 +218,6 @@ wc(texts)
 #textsref=textsref%>%rename(doc_id=status_id)
 ```
 
-For comparison, here is a word cloud of the 300 most prolific non-hoaxist covid related tweeters.
-```{r nonhoaxer,echo=FALSE}
-wc(textsref)
-
-
-```
 
 
 
@@ -246,8 +241,21 @@ tr=lm(trumpid~hoaxer,ctexts)
 #summary(tr)
 
 ```
-So both hoaxers and non hoaxers tweet a lot about Trump (besides covid19). Of course hoaxist might mention him in support whereas others might critisize him. We will explore this in future work. For now let's examine  which of the two groups is more obsessed about Trump? 
-Analysis of the data suggests that Hoaxists mention Trump signficantly more: hoaxers have a  `r round(tr$coefficients[["hoaxerTRUE"]]*100,2) ` percentage point higher probability of mentioning Trump (The share of Trump mentions across both groups is `r round(mean(ctexts$trumpid)*100,2)`%).
+
+
+
+For comparison, here is a word cloud of the 300 most prolific non-hoaxist covid related tweeters. Trump is relevant here too although do a smaller degree: hoaxers have a  `r round(tr$coefficients[["hoaxerTRUE"]]*100,2) ` percentage point higher probability of mentioning Trump (The share of Trump mentions across both groups is `r round(mean(ctexts$trumpid)*100,2)`%). Of course it might also be that one group is supporting Trump whereas the other is opposing him. We will address this in future work. 
+
+
+
+
+```{r nonhoaxer,echo=FALSE}
+wc(textsref)
+
+
+```
+
+
 
 Also note that the term "filmyourhospital" shows up prominently, which according [reports](https://www.mediamatters.org/coronavirus-covid-19/coronavirus-denying-conspiracy-theory-hashtag-spreading-tiktok-infowars-host) is a hastag pushed by right-wing commentators.
 
@@ -402,7 +410,8 @@ We have to be cautious with causal claims at this stage. Our results could be co
 ```{r  message=FALSE, results='asis',echo=FALSE} 
 library(stargazer)
 
-stargazer(r1,  r3,r4,r5, type = "html")
+stargazer(r1,  r3,r4,r5, type = "html", dep.var.labels   = "Covid19 Cases per capita", covariate.labels = c("Share of Hoax Tweets", "Population density", "Population", "Tweets per capita",
+                               "Hoax Tweets $\times$ Density", "Constant"))
 ```
 
 <br/><br/>
