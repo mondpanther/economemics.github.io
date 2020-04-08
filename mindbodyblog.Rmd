@@ -1,13 +1,16 @@
 ---
 title: "Infections of the body and the mind"
-output: html_document
+output: bookdown::html_document2
 css:    mondstyle.css
 editor_options: 
 chunk_output_type: inline
+header-includes:
+   - \usepackage{floatrow}
+   - \floatsetup[figure]{capposition=top}
 
 ---
 
-**by  [Ralf Martin](https://www.imperial.ac.uk/people/r.martin)^[Imperial College Business School  & Centre for Economic Perforamnce, LSE]** 
+**by  [Ralf Martin](https://www.imperial.ac.uk/people/r.martin)^[Imperial College Business School  & Centre for Economic Perforamnce, London School of Economics]** 
 
 
 <!--html_preserve-->
@@ -67,69 +70,27 @@ nhoax=sum(scomb$igtweets)
 ```
 
 
- 
 
 
+The coronavirus pandemic has changed everything overnight. Unfortunately, as the genetic sequence of the virus started to make its deadly journey through bodies around the world, in parallel a memetic sequence emerged in the minds of some people: the idea that covid19 pandemic is not real and a hoax. Indeed, the worry is that the two infections exist in a symbiotic relationship with one helping to advance the survival and spread of the other because widespread believe in Hoaxism might prevent people from following guidelines to limit the spread of the pandemic.
 
-The coronavirus pandemic has changed everything overnight. Unfortunately, as the genetic sequence of the virus started to make its deadly journey through bodies around the world, in parallel a memetic sequence emerged in the minds of some people: the idea that covid19 pandemic is not real and a hoax. Indeed, the worry is that the two infections exist in a symbiotic relationship with one helping to advance the survival and spread of the other. To monitor and study this phenomenon we have been sampling tweets mentioning the terms “corona” and/or “covid”. Since March 23 we have collected   `r ntweets` million  tweets. We measure hoaxsim by looking for tweets we look for tweets with the hastag hoax (or coronahoax, covidhoax).
+To monitor and study this phenomenon we (a team of Imperial College and LSE researchers) have been sampling tweets mentioning the terms “corona” and/or “covid”. Since March 23 we have collected   `r ntweets` million  tweets. We measure hoaxsim by looking for tweets we look for tweets with the hastag hoax (or coronahoax, covidhoax). There was a massive spike in hoaxism around the weekend of March 28 with hoax tweet rates of over 4%. Dis-regarding that hoaxism progresses at a stable rate of about 0.5%.
 
-
-What are the drivers hoaxism? One hypothesis is that hoaxism was driven by the Trump Junta who had a vested interest in downplaying the crisis because of worries that the economic impacts of a shutdown could affect Trump's re-election chances.
-
-
-
-Some emerging results include the following:
-
-- There is no sign that hoax meme has run its course. Over our admittedly short sample period of about two weeks the overal level of hoaxism remained stable.
-- There is some evidence that Donald Trump has to answer for the hoax meme. Hoax believers are particularly obsessed with him.
-- There is evidence that believe in Hoax led to more higher covid cases than necessary. Across US states we find a strong correlation between hoax believer rates and covid cases. 
-- We have evidence that is consistent with the idea that interaction between population density and hoaxism is a major factor in explaining the severety of the pandemic.
-- We have to be careful with causal interpretations but the numbers would imply that US covid cases could be about 50% lower in absence of hoaxism.
+<br/><br/>
 
 
-
-
-# Hoaxism over time
-
-How bad is the hoax infection and is it getting better or worse? To identify tweeters believing in the hoax (or promoting the hoax idea) we look for tweets with one of the following hastags:
-
-- "#hoax"
-- "#coronahoax"
-- "#covidhoax"
-- "#chinesevirus"
-
-Using hashtags instead of string searches of the same terms provides a good distinction between tweets who display support for hoaxsim vs tweets criticising hoaxism. Note that this is likely a conservative way of counting hoaxist tweets and in reality a larger fraction of tweets are from people supporting hoaxist ideas.
-
-Below is a time series plot of the share of hoaxist tweets over our sample period. we report separate series for the Us and UK. Assigning location to tweets is notoriously difficult as most users have switch off detailed location tracking. In the figure below we base location on the analysis of a free text field where users can write something about their whereabouts. In many cases this refers to known areas although the detail varies (e.g. London, UK vs the Universe). Often it also involves phantasy locations (e.g. Walhalla). Hence, our "other" category might include tweeters from either the UK or Us who have chosen not to reveal their location.
-
-Note that towards the begining of the sample period the share of hoax tweets in all covid related tweets is less than 0.5%. However, the weekend  around the 28th of March saw a major outbreak of Hoaxism that was particularly bad in the UK. This has subsided somewhat come March 30. The whole sample trend would suggest that hoaxism is fairly stable and not subsiding.
-
-```{r tsplot,echo=FALSE}
+```{r tsplot,echo=FALSE,fig.width=8,fig.height=6,fig.cap="Hoaxism over time"}
 tsplot=ggplot(scomb, aes(x = date,y=hoaxsh,color=country  )  )+geom_point() +  geom_line() + theme_minimal() + xlab("Time") +ylab("Share of hoax tweets [%]")
 
 tsplot
 ```
 
-
-```{r, echo=FALSE}
-scomb=scomb%>%group_by(date) %>% summarise(tot=sum(tweets)) %>% merge(scomb,by="date") %>% mutate(totsh=tweets/tot *100)
-tsp2=ggplot(scomb, aes(x = date,y=totsh,color=country  )  )+geom_point() +  geom_line() + theme_minimal() + xlab("Time") +ylab("Share in %")
-
-#tsp2
-```
+<br/><br/>
 
 
+What are the drivers hoaxism? One hypothesis is that hoaxism was driven by the Trump Junta who had a vested interest in downplaying the crisis because of worries that the economic fallout could dampen Trump's re-election chances. We can examine this by looking at word clouds of all tweets by prolific hoaxist tweeters:
 
 
-
-
-
-
-
-
-# Why hoaxism?
-
-What are drives hoaxism? We can start exploring this by looking at the tweets of hoaxists more widely. Below we plot a word cloud of the last 1000 tweets of the 300 most prolific hoaxists. One hypothesis is that hoaxism has been fueled by Trumpism. Because of worries that a strong response to the pandemic could negatively affect the economy and thereby his re-election chances, he had a vested interest in playing down the crisis. The word cloud confirms that obsession with trump is prevalent among hoxists.
 
 ```{r wordclouds,include=FALSE, echo=FALSE}
 
@@ -212,14 +173,15 @@ wc=function(texts){
 ```
 
 
-```{r wordcloudsregs, echo=FALSE}
+
+
+```{r wordcloudsregs, echo=FALSE, fig.width=8,fig.height=6,fig.cap="Word cloud of hoaxist's tweets"}
 
 wc(texts)
 #names(combstream)
 #textsref=subset(comb, select = c(status_id,text))
 #textsref=textsref%>%rename(doc_id=status_id)
 ```
-
 
 
 
@@ -246,39 +208,16 @@ tr=lm(trumpid~hoaxer,ctexts)
 
 
 
-For comparison, here is a word cloud of the 300 most prolific non-hoaxist covid related tweeters. Trump is relevant here too although do a smaller degree: hoaxers have a  `r round(tr$coefficients[["hoaxerTRUE"]]*100,2) ` percentage point higher probability of mentioning Trump (The share of Trump mentions across both groups is `r round(mean(ctexts$trumpid)*100,2)`%). Of course it might also be that one group is supporting Trump whereas the other is opposing him. We will address this in future work. 
+
+We find indeed that Trump is a popular term among hoaxists. Indeed we find that his probability of being mentioned by hoaxists is significantly larger than among non hoaxist covid tweeters (`r round((tr$coefficients[["hoaxerTRUE"]]+tr$coefficients[["(Intercept)"]])*100,2)`%  as opposed to `r round((tr$coefficients[["(Intercept)"]])*100,2)`%)
 
 
+Of course, the big question is if all of this matters for actual covid outcomes? To start answering this, we correlated infection rates (covid19 cases per 1000 residents) with hoaxism infection rates at the level of US states (see Figure 2). It is very striking that New York does not only have record levels of covid infections but also record levels of hoaxism. But of course, there are other states (notably Alaska and Alabahma) with high hoaxism levels but rather low infection rates. Various people have suggested that population density is an important factor in explaining covid infection rates.  A hypothesis that emerges from  our current observations is that what matters is the interaction between the two. This is particularly plausible when comparing New York and New Jersey, which has higher density but lower covid and lower hoaxism rates than New York.
+What's more: while we have to be cautious in interpreting correlation as causation, a causal interpretation of our current numbers would imply substantial impacts of hoaxism: For the US as a whole it could suggest that about half of covid cases are down to hoaxism. 
+Clearly, this warrants further investigation. One issue with the results for New York could be that we lump metropolitian areas of New York city with rather rural areas of New York state.
+We will therefore continue to monitor and analyse hoaxists tweets. Updates will be [here](https://mondpanther.github.io/economemics.github.io/mindbody.html).
 
 
-```{r nonhoaxer,echo=FALSE}
-wc(textsref)
-
-
-```
-
-
-
-Also note that the term "filmyourhospital" shows up prominently, which according [reports](https://www.mediamatters.org/coronavirus-covid-19/coronavirus-denying-conspiracy-theory-hashtag-spreading-tiktok-infowars-host) is a hastag pushed by right-wing commentators.
-
-
-# The consequences of memetic infections
-
-We examine if US state level hoax infection rates are correlated with reported covid19 infection rates. This is interesting to gauge if mis-information has any effect on actual outcomes. Clearly, from a simple exercise like that we cannot draw overly strong conclusions about causal effects. However, it is a useful starting point. 
-The figure below is a scatter plot of state level per capita infection rates on the share of hoax tweets (in percent) from within the state. There is clearly a positive relationship. What is particularly striking is that New York is not only extreme in terms of infections but also in the prevalenc of hoaxism.
-
-<br/><br/>
-
-
-```{r, echo=FALSE}
-#https://rstudio-pubs-static.s3.amazonaws.com/265609_47fe3e17b8ec4e4792340624f55b3544.html
-
-#```{r sampleani, fig.show='animate', fig.width=4, fig.height=4, cache=FALSE, interval=0.05, aniopts="controls,loop"}
-#for (i in 1:50) {
-#    plot(x=i/10, y=i/10, xlim=c(0,6), ylim=c(0,6), pch=20, col=palette()[2], cex=5)
-#}
-
-```
 
 
 
@@ -360,8 +299,7 @@ all=base::sum(stats$cases)
 <br/><br/>
 
 
-
-```{r,  echo=FALSE}
+```{r,  echo=FALSE, fig.width=7,fig.height=6,fig.cap="\\label{fig:hoaxscatter}Hoaxism vs Covid Infections"}
 library(ggrepel)
 ggplot(stats) + 
     aes(y=casesPC, x=hoaxsh,label=state) +
@@ -371,17 +309,12 @@ ggplot(stats) +
 
 ```
 
-<br/><br/>
-
-An alternative explanation for the striking infection rates in New York is the relative density of New York. That's why we also examine the relationship between infection rates and density (in people per square mile). Indeed there is a positive relationship as well. But New York seems to be more of an outlier in terms of density. 
-Indeed one potential hypothesis the two figures combined suggests is that there might be an interaction effect between hoaxism and density. Take for instance Alaska, which has the second highest rates of hoaxism, but much lower infection rates than New York. Of course it's also the least densiley populated state. On the other hand: consider New Jersey which is actually more dense than New York but has much lower rates of infection. It turns out that hoaxism is also less prevalent there.
-
 
 
 <br/><br/>
 
 
-```{r,  echo=FALSE}
+```{r,  echo=FALSE,fig.width=7,fig.height=6,fig.cap="\\label{fig:densityscatter}Population density vs Covid Infections"}
 library(ggrepel)
 ggplot(stats) + 
     aes(y=casesPC, x=density,label=state) +
@@ -392,29 +325,6 @@ ggplot(stats) +
 ```
 
 
-<br/><br/>
 
 
-To explore this more below we also undertake regression analysis. The Table below shows that:
-
-- Hoaxsim is indeed significantly and positively related to hoaxism (Column 1). The coefficient implies that a 1 percentage point higher hoaxism level is associated with 0.822 extra covid patients per 1000 citizens.
-
-- This is result is highly robust to the inclusion of further controls such as population density, population size and covid tweet intensity (covid related tweets per 1000 people) in column 2. 
-
-- The hoaxism and density interaction hypothesis is confirmed in column 3 where we include the interaction of both variables as an additional regression coefficient. In column 4, drop New York from the sample. The interaction hypothesis is robust to that.
-
-
-We have to be cautious with causal claims at this stage. Our results could be contingent on our  simple model specification or crude aggregation (e.g. we don't take into account that New York state consists of the metropolitian area of New York as well as rarther rural parts). Still, to understand if the results are not only statistically significant but also quantitatively meaningful it is useful to ask what - if taken at face value - the impact of haoxism would be. Using the estimates from column 4 would imply that without hoaxism  we had  `r format(saved,scientific=FALSE)` covid cases less (of `r format(all,scientific=FALSE)`), as of `r max(stats$date)`. Clearly, this is substantial.
-
-<br/><br/>
-
-
-```{r  message=FALSE, results='asis',echo=FALSE} 
-library(stargazer)
-
-stargazer(r1,  r3,r4,r5, type = "html", dep.var.labels   = "Covid19 Cases per capita", covariate.labels = c("Share of Hoax Tweets", "Population density", "Population", "Tweets per capita",
-                               "Hoax Tweets $\times$ Density", "Constant"))
-```
-
-<br/><br/>
 

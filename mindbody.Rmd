@@ -402,7 +402,7 @@ To explore this more below we also undertake regression analysis. The Table belo
 - The hoaxism and density interaction hypothesis is confirmed in column 3 where we include the interaction of both variables as an additional regression coefficient. In column 4, drop New York from the sample. The interaction hypothesis is robust to that.
 
 
-We have to be cautious with causal claims at this stage. Our results could be contingent on our  simple model specification or crude aggregation (e.g. we don't take into account that New York state consists of the metropolitian area of New York as well as rarther rural parts). Still, to understand if the results are not only statistically significant but also quantitatively meaningful it is useful to ask what - if taken at face value - the impact of haoxism would be. Using the estimates from column 4 would imply that without hoaxism  we had  `r format(saved,scientific=FALSE)` covid cases less (of `r format(all,scientific=FALSE)`), as of `r max(stats$date)`. Clearly, this is substantial.
+We have to be cautious with causal claims at this stage. Our results could be contingent on our  simple model specification or crude aggregation (e.g. we don't take into account that New York state consists of the metropolitian area of New York as well as rarther rural parts). Still, to understand if the results are not only statistically significant but also quantitatively meaningful it is useful to ask what - if taken at face value - the impact of haoxism would be. Using the estimates from column 4 would imply that without hoaxism  we had  `r format(saved,scientific=FALSE)` covid cases less (of a total of `r format(all,scientific=FALSE)`), as of `r max(stats$date)`. Clearly, this is substantial.
 
 <br/><br/>
 
