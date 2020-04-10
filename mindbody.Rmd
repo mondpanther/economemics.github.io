@@ -482,7 +482,7 @@ stargazer(r1,  r2, r4 ,r6,r7, type = "html",  omit=c("state","date","Constant") 
 
 
 ```{r, eval=FALSE}
-df=statsbyd %>% filter(state!="Alabama")
+df=statsbyd %>% filter(state=="New York")
 tsplot=ggplot(df , aes(x = date,y=hoaxsh,color=state  )  )+geom_point() +  geom_line() + theme_minimal() + xlab("Time") +ylab("Share of hoax tweets [%]")
 
 tsplot
