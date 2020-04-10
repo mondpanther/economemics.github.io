@@ -1,0 +1,11 @@
+base
+rtweet
+tidytext
+ggplot2
+dplyr
+gdata
+NLP
+tm
+RColorBrewer
+wordcloud
+wordcloud2

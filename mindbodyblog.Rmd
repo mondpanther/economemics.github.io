@@ -1,6 +1,7 @@
 ---
 title: "Infections of the body and the mind"
-output: bookdown::html_document2
+#output: bookdown::html_document2
+output: bookdown::word_document2
 css:    mondstyle.css
 editor_options: 
 chunk_output_type: inline
@@ -175,7 +176,7 @@ wc=function(texts){
 
 
 
-```{r wordcloudsregs, echo=FALSE, fig.width=8,fig.height=6,fig.cap="Word cloud of hoaxist's tweets"}
+```{r wordcloudsregs, cache=TRUE,echo=FALSE, fig.width=8,fig.height=6,fig.cap="Word cloud of hoaxist's tweets"}
 
 wc(texts)
 #names(combstream)
@@ -183,6 +184,8 @@ wc(texts)
 #textsref=textsref%>%rename(doc_id=status_id)
 ```
 
+
+<br/><br/>
 
 
 ```{r,echo=FALSE}
@@ -213,7 +216,7 @@ We find indeed that Trump is a popular term among hoaxists. Indeed we find that 
 
 
 Of course, the big question is if all of this matters for actual covid outcomes? To start answering this, we correlated infection rates (covid19 cases per 1000 residents) with hoaxism infection rates at the level of US states (see Figure 2). It is very striking that New York does not only have record levels of covid infections but also record levels of hoaxism. But of course, there are other states (notably Alaska and Alabahma) with high hoaxism levels but rather low infection rates. Various people have suggested that population density is an important factor in explaining covid infection rates.  A hypothesis that emerges from  our current observations is that what matters is the interaction between the two. This is particularly plausible when comparing New York and New Jersey, which has higher density but lower covid and lower hoaxism rates than New York.
-What's more: while we have to be cautious in interpreting correlation as causation, a causal interpretation of our current numbers would imply substantial impacts of hoaxism: For the US as a whole it could suggest that about half of covid cases are down to hoaxism. 
+What's more: while we have to be cautious in interpreting correlation as causation, a causal interpretation of our current numbers would imply substantial impacts of hoaxism: For the US as a whole it could suggest that about 13% of covid cases are down to hoaxism. 
 Clearly, this warrants further investigation. One issue with the results for New York could be that we lump metropolitian areas of New York city with rather rural areas of New York state.
 We will therefore continue to monitor and analyse hoaxists tweets. Updates will be [here](https://mondpanther.github.io/economemics.github.io/mindbody.html).
 

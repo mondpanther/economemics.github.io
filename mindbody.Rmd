@@ -82,7 +82,7 @@ Some emerging results include the following:
 - There is some evidence that Donald Trump has to answer for the hoax meme. Hoax believers are particularly obsessed with him.
 - There is evidence that believe in Hoax led to more higher covid cases than necessary. Across US states we find a strong correlation between hoax believer rates and covid cases. 
 - We have evidence that is consistent with the idea that interaction between population density and hoaxism is a major factor in explaining the severety of the pandemic.
-- We have to be careful with causal interpretations but the numbers would imply that US covid cases could be about 50% lower in absence of hoaxism.
+- We have to be careful with causal interpretations but the numbers would imply that US covid cases could be about 13% lower in absence of hoaxism.
 
 
 
@@ -111,7 +111,8 @@ tsplot
 
 ```{r, echo=FALSE}
 scomb=scomb%>%group_by(date) %>% summarise(tot=sum(tweets)) %>% merge(scomb,by="date") %>% mutate(totsh=tweets/tot *100)
-tsp2=ggplot(scomb, aes(x = date,y=totsh,color=country  )  )+geom_point() +  geom_line() + theme_minimal() + xlab("Time") +ylab("Share in %")
+
+tsp2=ggplot(scomb %>% filter(country!="ddother"), aes(x = date,y=tweets,color=country  )  )+geom_point() +  geom_line() + theme_minimal() + xlab("Time") +ylab("Share in %")
 
 #tsp2
 ```
@@ -210,7 +211,7 @@ wc=function(texts){
 ```
 
 
-```{r wordcloudsregs, echo=FALSE}
+```{r wordcloudsregs, cache=TRUE, echo=FALSE}
 
 wc(texts)
 #names(combstream)
@@ -221,7 +222,7 @@ wc(texts)
 
 
 
-```{r,echo=FALSE}
+```{r,cache=TRUE,echo=FALSE}
 
 texts['hoaxer']=TRUE
 textsref['hoaxer']=FALSE
@@ -249,7 +250,7 @@ For comparison, here is a word cloud of the 300 most prolific non-hoaxist covid 
 
 
 
-```{r nonhoaxer,echo=FALSE}
+```{r nonhoaxer,cache=TRUE,echo=FALSE}
 wc(textsref)
 
 
@@ -268,36 +269,61 @@ The figure below is a scatter plot of state level per capita infection rates on 
 <br/><br/>
 
 
-```{r, echo=FALSE}
-#https://rstudio-pubs-static.s3.amazonaws.com/265609_47fe3e17b8ec4e4792340624f55b3544.html
-
-#```{r sampleani, fig.show='animate', fig.width=4, fig.height=4, cache=FALSE, interval=0.05, aniopts="controls,loop"}
-#for (i in 1:50) {
-#    plot(x=i/10, y=i/10, xlim=c(0,6), ylim=c(0,6), pch=20, col=palette()[2], cex=5)
-#}
-
-```
-
-
-
 ```{r statelevel,echo=FALSE}
-
+#library(lfe)
 
 
 stats=readRDS("../results/stats.Rda")
-stats=stats%>%mutate(pop=pop/1000)
+statsbyd=readRDS("../results/statsbyd.Rda")
+
+stats=stats%>%mutate(pop=pop/1000, hoaxshXdensity=hoaxsh*density,tweetsPCXdensity=tweetsPC*density)
+statsbyd=statsbyd%>%mutate(pop=pop/1000, hoaxshXdensity=hoaxsh*density,tweetsPCXdensity=tweetsPC*density)
+
+#statsbyd <- statsbyd %>% arrange(., state, date) %>%
+#  group_by(state) %>%
+#  mutate(dayx = 1:n())
+
+
 
 r1=lm(casesPC~hoaxsh,stats)
-r2=lm(casesPC~hoaxsh+density+pop,stats)
+r2=lm(casesPC~hoaxsh+density+tweetsPC,stats)
 
 
-r3=lm(casesPC~hoaxsh+density+pop+tweetsPC,stats)
-r4=lm(casesPC~hoaxsh*density+pop+tweetsPC,stats)
-r5=lm(casesPC~hoaxsh*density+pop+tweetsPC,stats%>%filter(state!="New York"))
+#r3=lm(casesPC~hoaxsh + density + tweetsPC ,stats)
+r4 =lm(casesPC~hoaxsh + density + tweetsPC +  hoaxshXdensity  + tweetsPCXdensity  ,stats)
+#r5=lm(casesPC~hoaxsh*density+pop+tweetsPC*density,stats%>%filter(state!="New York"))
 
+#lm.cluster(data, formula, cluster, weights=NULL, subset=NULL )
+
+#library(miceadds)
+#r6=lm.cluster(data=statsbyd, formula=casesPC~hoaxsh*density+tweetsPC*density+factor(state)+factor(date)  , cluster="state"  )
+
+r6=lm(casesPC~hoaxsh+tweetsPC +  hoaxshXdensity + tweetsPCXdensity   + factor(state)+factor(date), statsbyd )
+r7=lm(casesPC~hoaxsh+tweetsPC +  hoaxshXdensity + tweetsPCXdensity   + factor(state)+factor(date), statsbyd %>%filter(state!="New York") )
+
+
+#r8=lm(deathsPC~casesPC+casesPC:density+ tweetsPC:density+hoaxsh:density+hoaxsh+tweetsPC+factor(state)+factor(date), statsbyd )
+
+#r6=(felm((casesPC)~hoaxsh*density+tweetsPC*density+factor(state)+factor(date)|0|0|state,data=statsbyd  ))
+#ols1 <- felm(y ~ x + z|0|0|firmid, data = petersen)
+summary(r4)
+
+
+#summary(r6)
+#summary(r8)
+#summary(r6,cluster=c("fstate"))
+
+#summary(lm((casesPC)~hoaxsh:density+tweetsPC:density+hoaxsh+tweetsPC+factor(state)+factor(date), statsbyd  ))
+
+
+#summary(lm((casesPC)~hoaxsh*density+tweetsPC*density+factor(date), statsbyd  ))
+
+
+#summary(lm((casesPC)~hoaxsh*density+tweetsPC*density, stats  ))
 
 
 #summary(lm(casesPC~hoaxsh+density,stats%>%filter(hoaxsh<7 & casesPC<10)))
+
 #summary(lm(casesPC~hoaxsh+density,stats%>%filter(state!="New Jersey" & state!="New York")))
 
 #stats=stats%>%mutate(DD=  (r4$coefficients[["hoaxsh"]]+r4$coefficients[["hoaxsh:density"]] * density ) *hoaxsh * pop/1000)
@@ -312,23 +338,25 @@ r5=lm(casesPC~hoaxsh*density+pop+tweetsPC,stats%>%filter(state!="New York"))
 #summary(r1)
 #summary(r2)
 #summary(r3)
-#summary(r4)
+#summary(r5)
 
-sss=stats%>%summarise(pop=sum(pop),cases=sum(cases), tweets=sum(tweets),hoax=sum(hoax))
-sss=sss%>% mutate(hoaxsh=hoax/tweets*100,casesPC=cases/pop)
+#sss=stats%>%summarise(pop=sum(pop),cases=sum(cases), tweets=sum(tweets),hoax=sum(hoax))
+#sss=sss%>% mutate(hoaxsh=hoax/tweets*100,casesPC=cases/pop)
 #sss=sss%>% mutate(saved=(r4$coefficients[["hoaxsh"]]+r4$coefficients[["hoaxsh:density"]] * density ) * hoaxsh  *  pop)
 
 
-coef=r3$coefficients[["hoaxsh"]]
+
+#coef=r6$coefficients[["hoaxsh"]]
+#r6$coefficients[["hoaxshXdensity"]]
 
 
 #stats=stats%>% mutate(saved=(r3$coefficients[["hoaxsh"]]) * hoaxsh  *  pop)
-#stats=stats%>% mutate(saved=(r4$coefficients[["hoaxsh"]]+r4$coefficients[["hoaxsh:density"]] * density ) * hoaxsh  *  pop)
-stats=stats%>% mutate(saved=(r5$coefficients[["hoaxsh"]]+r5$coefficients[["hoaxsh:density"]] * density ) * hoaxsh  *  pop)
+#stats=stats%>% mutate(saved=(r5$coefficients[["hoaxsh"]]+r5$coefficients[["hoaxsh:density"]] * density ) * hoaxsh  *  pop)
+stats=stats%>% mutate(saved=(r6$coefficients[["hoaxsh"]]+r6$coefficients[["hoaxshXdensity"]] * density ) * hoaxsh  *  pop)
 
 
 
-stats=stats%>% mutate(saved=ifelse(saved>cases, cases,saved))
+#stats=stats%>% mutate(saved=ifelse(saved>cases, cases,saved))  # remove over shoots
 
 #summary(stats$saved)
 
@@ -336,8 +364,9 @@ stats=stats%>% mutate(saved=ifelse(saved>cases, cases,saved))
 #View(look)
 
 
-stats=stats%>%mutate(hoaxsh2=hoaxsh^2,density2=density^2)
-saved=base::sum(stats$saved)
+#stats=stats%>%mutate(hoaxsh2=hoaxsh^2,density2=density^2)
+
+saved=base::sum(stats$saved)  
 all=base::sum(stats$cases)
 
 
@@ -348,11 +377,17 @@ all=base::sum(stats$cases)
 
 
 #summary(lm(log(casesPC)~hoaxsh*density+tweetsPC+pop,stats))
+#summary(lm(log(casesPC)~hoaxsh*density+tweetsPC*density+pop,stats))
 #summary(lm(casesPC~density+tweetsPC,stats))
 #summary(lm(casesPC~hoaxsh*density+pop+tweetsPC+density2+hoaxsh2,stats%>%filter(state!="New York")))
 #summary(lm(casesPC~hoaxsh+density+pop+tweetsPC,stats%>%filter(state!="New York")))
 
 #summary(lm(casesPC~hoaxsh+density+tweetsPC,stats%>%filter(state!="New York")))
+
+
+
+
+
 ```
 
 <br/><br/>
@@ -399,10 +434,13 @@ To explore this more below we also undertake regression analysis. The Table belo
 
 - This is result is highly robust to the inclusion of further controls such as population density, population size and covid tweet intensity (covid related tweets per 1000 people) in column 2. 
 
-- The hoaxism and density interaction hypothesis is confirmed in column 3 where we include the interaction of both variables as an additional regression coefficient. In column 4, drop New York from the sample. The interaction hypothesis is robust to that.
+- The hoaxism and density interaction hypothesis is confirmed in column 3 where we include the interaction of both variables as an additional regression coefficient (as well as the interaction of covid tweet intensity with density as additional control)
 
+- In column 4, we identify the model from daily data rather than a cross sectional variation of the latest available period (day). This allows us to control to include state as well as day control (density is no longer separately identified as it becomes a fixed state level characterstics). Hence we implicity control for all fixed state characteristics that could might be confounding our estimate. This preserves our qualitative conclusions alhtough the estimates coefficients become lower.
 
-We have to be cautious with causal claims at this stage. Our results could be contingent on our  simple model specification or crude aggregation (e.g. we don't take into account that New York state consists of the metropolitian area of New York as well as rarther rural parts). Still, to understand if the results are not only statistically significant but also quantitatively meaningful it is useful to ask what - if taken at face value - the impact of haoxism would be. Using the estimates from column 4 would imply that without hoaxism  we had  `r format(saved,scientific=FALSE)` covid cases less (of a total of `r format(all,scientific=FALSE)`), as of `r max(stats$date)`. Clearly, this is substantial.
+- In column 5 we repeat the exercise while dropping all observations from New York. This has little impact on the findings related to hoaxism (although the tweet x density interaction now turns negative)
+
+We have to be cautious with causal claims at this stage. Our results could be contingent on our  simple model specification or crude aggregation (e.g. we don't take into account that New York state consists of the metropolitian area of New York as well as rarther rural parts, although as we saw in column 5, the results are not contingent on New York). Still, to understand if the results are not only statistically significant but also quantitatively meaningful it is useful to ask what - if taken at face value - the impact of haoxism would be. Using the estimates from column 4 which we consider our most reliable at this stage would imply that without hoaxism  we had  `r format(round(saved,0),scientific=FALSE) ` covid cases less (of a total of `r format(all,scientific=FALSE)`), as of `r max(stats$date)`. Clearly, this is substantial.
 
 <br/><br/>
 
@@ -410,8 +448,27 @@ We have to be cautious with causal claims at this stage. Our results could be co
 ```{r  message=FALSE, results='asis',echo=FALSE} 
 library(stargazer)
 
-stargazer(r1,  r3,r4,r5, type = "html", dep.var.labels   = "Covid19 Cases per capita", covariate.labels = c("Share of Hoax Tweets", "Population density", "Population", "Tweets per capita",
-                               "Hoax Tweets $\times$ Density", "Constant"))
+cns=names(coef(r6)) 
+cns=cns[ grepl( "factor", cns)==TRUE]
+
+cns=as.vector(cns)
+
+cns=c("factor(state)Arkansas" ,"Population")
+
+#r6=r6$lm_res
+clabels = c("Hoax Tweets Share", "Population density",  "Tweets per capita",    "Hoax X Density" ,"Tweets X Density")
+
+#cns=c("Constant","Population")
+stargazer(r1,  r2, r4 ,r6,r7, type = "html",  omit=c("state","date","Constant")  ,
+          covariate.labels =clabels,
+          df = FALSE,
+          dep.var.labels   = "Covid19 Cases per capita",
+                  add.lines = list(
+        c("States Controls", "No", "No", "No","Yes", "Yes"),
+        c("Day Controls", "No", "No", "No","Yes", "Yes"),
+        c("Sample", "Last Day", "Last Day", "Last Day","Daily", "NY dropped")
+          ))
+
 ```
 
 <br/><br/>
