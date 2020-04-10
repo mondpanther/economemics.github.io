@@ -306,7 +306,7 @@ r7=lm(casesPC~hoaxsh+tweetsPC +  hoaxshXdensity + tweetsPCXdensity   + factor(st
 
 #r6=(felm((casesPC)~hoaxsh*density+tweetsPC*density+factor(state)+factor(date)|0|0|state,data=statsbyd  ))
 #ols1 <- felm(y ~ x + z|0|0|firmid, data = petersen)
-summary(r4)
+#summary(r4)
 
 
 #summary(r6)
