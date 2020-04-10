@@ -379,7 +379,7 @@ summary {
     gtag('config', 'UA-3928947-4');
   </script>
 
-<p>Last update: April 10 , 2020 - 22:47</p>
+<p>Last update: April 10 , 2020 - 22:49</p>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
 <p>The coronavirus pandemic has changed everything overnight. Unfortunately, as the genetic sequence of the virus started to make its deadly journey through bodies around the world, in parallel a memetic sequence emerged in the minds of some people: the idea that covid19 pandemic is not real and a hoax. Indeed, the worry is that the two infections exist in a symbiotic relationship with one helping to advance the survival and spread of the other. Here we report on our ongoing efforts to map the spread of memetic infection using Twitter. Since March 23 we have been sampling tweets mentioning the terms “corona” and/or “covid”. Currently, we have collected 7.63 million tweets.</p>
@@ -910,10 +910,6 @@ F Statistic
 </tr>
 </table>
 <p><br /><br /></p>
-<pre class="r"><code>df=statsbyd %&gt;% filter(state==&quot;New York&quot;)
-tsplot=ggplot(df , aes(x = date,y=hoaxsh,color=state  )  )+geom_point() +  geom_line() + theme_minimal() + xlab(&quot;Time&quot;) +ylab(&quot;Share of hoax tweets [%]&quot;)
-
-tsplot</code></pre>
 </div>
 <div class="footnotes">
 <hr />
