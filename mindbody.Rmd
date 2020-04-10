@@ -82,7 +82,7 @@ Some emerging results include the following:
 - There is some evidence that Donald Trump has to answer for the hoax meme. Hoax believers are particularly obsessed with him.
 - There is evidence that believe in Hoax led to more higher covid cases than necessary. Across US states we find a strong correlation between hoax believer rates and covid cases. 
 - We have evidence that is consistent with the idea that interaction between population density and hoaxism is a major factor in explaining the severety of the pandemic.
-- We have to be careful with causal interpretations but the numbers would imply that US covid cases could be about 13% lower in absence of hoaxism.
+- We have to be careful with causal interpretations but the numbers would imply that US covid cases could be about 30% lower in absence of hoaxism.
 
 
 
@@ -128,7 +128,7 @@ tsp2=ggplot(scomb %>% filter(country!="ddother"), aes(x = date,y=tweets,color=co
 
 # Why hoaxism?
 
-What are drives hoaxism? We can start exploring this by looking at the tweets of hoaxists more widely. Below we plot a word cloud of the last 1000 tweets of the 300 most prolific hoaxists. One hypothesis is that hoaxism has been fueled by Trumpism. Because of worries that a strong response to the pandemic could negatively affect the economy and thereby his re-election chances, he had a vested interest in playing down the crisis. The word cloud confirms that obsession with trump is prevalent among hoxists.
+What are drivers of hoaxism? We can start exploring this by looking at the tweets of hoaxists more widely. Below we plot a word cloud of the last 1000 tweets of the 300 most prolific hoaxists. One hypothesis is that hoaxism has been fueled by Trumpism. Because of worries that a strong response to the pandemic could negatively affect the economy and thereby his re-election chances, he had a vested interest in playing down the crisis. The word cloud confirms that obsession with trump is prevalent among hoxists.
 
 ```{r wordclouds,include=FALSE, echo=FALSE}
 
@@ -276,8 +276,14 @@ The figure below is a scatter plot of state level per capita infection rates on 
 stats=readRDS("../results/stats.Rda")
 statsbyd=readRDS("../results/statsbyd.Rda")
 
-stats=stats%>%mutate(pop=pop/1000, hoaxshXdensity=hoaxsh*density,tweetsPCXdensity=tweetsPC*density)
-statsbyd=statsbyd%>%mutate(pop=pop/1000, hoaxshXdensity=hoaxsh*density,tweetsPCXdensity=tweetsPC*density)
+
+
+stats=stats%>%mutate(pop=pop/1000, hoaxshXdensity=(hoaxsh)*(density-mean(density)),tweetsPCXdensity=(tweetsPC)*(density-mean(density)))
+
+
+statsbyd=statsbyd%>%group_by(date)%>%mutate(mtweetsPC=mean(tweetsPC),mhoaxsh=mean(hoaxsh),mdensity=mean(density))
+
+statsbyd=statsbyd%>%mutate(pop=pop/1000, hoaxshXdensity=(hoaxsh) *(density-mdensity),tweetsPCXdensity=(tweetsPC) * (density-mdensity) )
 
 #statsbyd <- statsbyd %>% arrange(., state, date) %>%
 #  group_by(state) %>%
@@ -338,7 +344,7 @@ r7=lm(casesPC~hoaxsh+tweetsPC +  hoaxshXdensity + tweetsPCXdensity   + factor(st
 #summary(r1)
 #summary(r2)
 #summary(r3)
-#summary(r5)
+summary(r6)
 
 #sss=stats%>%summarise(pop=sum(pop),cases=sum(cases), tweets=sum(tweets),hoax=sum(hoax))
 #sss=sss%>% mutate(hoaxsh=hoax/tweets*100,casesPC=cases/pop)
