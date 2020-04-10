@@ -344,7 +344,7 @@ r7=lm(casesPC~hoaxsh+tweetsPC +  hoaxshXdensity + tweetsPCXdensity   + factor(st
 #summary(r1)
 #summary(r2)
 #summary(r3)
-summary(r6)
+#summary(r6)
 
 #sss=stats%>%summarise(pop=sum(pop),cases=sum(cases), tweets=sum(tweets),hoax=sum(hoax))
 #sss=sss%>% mutate(hoaxsh=hoax/tweets*100,casesPC=cases/pop)
@@ -479,3 +479,12 @@ stargazer(r1,  r2, r4 ,r6,r7, type = "html",  omit=c("state","date","Constant") 
 
 <br/><br/>
 
+
+
+```{r, eval=FALSE}
+df=statsbyd %>% filter(state!="Alabama")
+tsplot=ggplot(df , aes(x = date,y=hoaxsh,color=state  )  )+geom_point() +  geom_line() + theme_minimal() + xlab("Time") +ylab("Share of hoax tweets [%]")
+
+tsplot
+
+```
