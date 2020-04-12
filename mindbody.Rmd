@@ -82,7 +82,7 @@ Some emerging results include the following:
 - There is some evidence that Donald Trump has to answer for the hoax meme. Hoax believers are particularly obsessed with him.
 - There is evidence that believe in Hoax led to more higher covid cases than necessary. Across US states we find a strong correlation between hoax believer rates and covid cases. 
 - We have evidence that is consistent with the idea that interaction between population density and hoaxism is a major factor in explaining the severety of the pandemic.
-- We have to be careful with causal interpretations but the numbers would imply that US covid cases could be about 30% lower in absence of hoaxism.
+- We have to be careful with causal interpretations but the numbers would imply that US covid cases could be about 23% lower in absence of hoaxism.
 
 
 
@@ -149,14 +149,16 @@ library(tm)
 tmls=readRDS("../results/tmls.rda")
 tmlsnon=readRDS("../results/tmlsnon.rda")
 
+#names(tmls)
 
-texts=tmls[,c('status_id','text')]
+keeps=c('status_id','text','created_at')
+texts=tmls[,keeps]
 
 
 texts=texts%>%dplyr::rename(doc_id=status_id)
 
 
-textsref=tmlsnon[,c('status_id','text')]
+textsref=tmlsnon[,keeps]
 textsref=textsref%>%dplyr::rename(doc_id=status_id)
 
 
@@ -222,7 +224,7 @@ wc(texts)
 
 
 
-```{r,cache=TRUE,echo=FALSE}
+```{r,cache=TRUE, echo=FALSE}
 
 texts['hoaxer']=TRUE
 textsref['hoaxer']=FALSE
@@ -231,15 +233,47 @@ textsref['hoaxer']=FALSE
 ctexts=rbind(texts,textsref)
 
 
+
+library(lubridate)
+
+start.date = ymd_hms("2010-01-01 00:00:00")
+end.date   = as_datetime(now()) #ymd_hms("2020-04-02 01:00:00")
+#end.date   = ymd_hms("2020-04-04 01:00:00")
+
+breaks = seq(start.date, end.date, "1 week")
+
+
+
+ctexts['weeks'] = cut(ctexts$created_at, breaks=breaks)
+
+
+
+
+
+
 ctexts['trumpid'] <-  mapply(grepl, pattern="trump", x=tolower(ctexts$text) )
 
 
 
+ctexts['climateid'] <-  mapply(grepl, pattern="climate", x=tolower(ctexts$text) )
+ctexts['hoaxid']    <-  mapply(grepl, pattern="hoax", x=tolower(ctexts$text) )
+
+ctexts=ctexts%>%mutate(climateXhoaxid=climateid==TRUE & hoaxid==TRUE)
 
 
+
+
+
+tr2=lm(climateid~hoaxer,ctexts)
+tr3=lm(climateXhoaxid~hoaxer,ctexts)
 
 tr=lm(trumpid~hoaxer,ctexts)
 #summary(tr)
+#summary(tr2)
+#summary(tr3)
+
+
+
 
 ```
 
@@ -482,9 +516,43 @@ stargazer(r1,  r2, r4 ,r6,r7, type = "html",  omit=c("state","date","Constant") 
 
 
 ```{r, eval=FALSE,echo=FALSE}
-df=statsbyd %>% filter(state=="New York")
+df=statsbyd %>% filter(state=="New York" | state=="New Jersey" |state=="Florida" | state=="Alaska" | state=="California")
 tsplot=ggplot(df , aes(x = date,y=hoaxsh,color=state  )  )+geom_point() +  geom_line() + theme_minimal() + xlab("Time") +ylab("Share of hoax tweets [%]")
-
 tsplot
+
+
+df=statsbyd %>% filter(state=="New York" | state=="New Jersey" |state=="Florida" | state=="Alaska" | state=="California")
+tsplot=ggplot(df , aes(x = date,y=DcasesPC,color=state  )  )+geom_point() +  geom_line() + theme_minimal() + xlab("Time") +ylab("Extra cases PC")
+tsplot
+
+
+df=statsbyd %>% filter(state=="New York" )
+tsplot=ggplot(df , aes(x = date,y=casesPC,color=state  )  ) +  geom_line()+geom_line(aes(x = date,y=hoaxsh,color=state  ) ) + theme_minimal() + xlab("Time") +ylab("Extra cases PC")
+tsplot
+
+
+df=statsbyd %>% filter(state=="New York" )
+tsplot=ggplot(df , aes(x = date,y=casesPC,color=state  )  ) +  geom_line()+geom_line(aes(x = date,y=tweetsPC,color=state  ) ) + theme_minimal() + xlab("Time") +ylab("Extra cases PC")
+tsplot
+
+
+
+df=statsbyd %>% filter(state=="Louisiana" )
+tsplot=ggplot(df , aes(x = date,y=casesPC,color=state  )  ) +  geom_line()+geom_line(aes(x = date,y=hoaxsh,color="blue"  ) ) + theme_minimal() + xlab("Time") +ylab("Extra cases PC")
+tsplot
+
+
+
+
+df=statsbyd %>% filter(state=="Alaska" )
+tsplot=ggplot(df , aes(x = date,y=casesPC,color=state  )  ) +  geom_line()+geom_line(aes(x = date,y=hoaxsh,color="blue"  ) ) + theme_minimal() + xlab("Time") +ylab("Extra cases PC")
+tsplot
+
+df=statsbyd %>% filter(state=="New Jersey" )
+tsplot=ggplot(df , aes(x = date,y=casesPC,color=state  )  ) +  geom_line()+geom_line(aes(x = date,y=hoaxsh,color="blue"  ) ) + theme_minimal() + xlab("Time") +ylab("Extra cases PC")
+tsplot
+
+
+
 
 ```

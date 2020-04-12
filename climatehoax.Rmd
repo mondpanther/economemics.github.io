@@ -1,0 +1,445 @@
+---
+title: "Infections of the body and the mind"
+output: html_document
+css:    mondstyle.css
+editor_options: 
+chunk_output_type: inline
+
+---
+
+**by [Julio Amador Diaz Lopez](https://www.imperial.ac.uk/people/j.amador)^[Imperial College Business School] and [Ralf Martin](https://www.imperial.ac.uk/people/r.martin)^[Imperial College Business School  & Centre for Economic Perforamnce, LSE]** 
+
+
+<!--html_preserve-->
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-3928947-4"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+  
+    gtag('config', 'UA-3928947-4');
+  </script>
+<!--/html_preserve-->
+
+
+Last update:  `r format(Sys.time(), '%B %d , %Y - %H:%M ')`
+
+```{r Notes,eval=FALSE,include=FALSE}
+#We are using this: https://www.earthdatascience.org/courses/earth-analytics/get-data-using-apis/use-twitter-api-r/
+
+#This is useful too: https://rtweet.info/
+
+```
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(rtweet)
+library(tidytext)
+
+# plotting and pipes - tidyverse!
+library(ggplot2)
+library(dplyr)
+library(gdata)
+
+
+
+source("../code/gettoken.R")
+
+
+```
+
+
+
+
+
+```{r load ts data,include=FALSE}
+#`r ntweets'
+
+scomb=readRDS("../results/scomb.rda")
+
+ntweets= round(sum(scomb$tweets) /10^6,2)
+
+
+
+nhoax=sum(scomb$igtweets)
+
+```
+
+
+
+# Introduction
+
+
+The coronavirus pandemic has changed everything overnight. Unfortunately, as the genetic sequence of the virus started to make its deadly journey through bodies around the world, in parallel a memetic sequence emerged in the minds of some people: the idea that covid19 pandemic is not real and a hoax. Indeed, the worry is that the two infections exist in a symbiotic relationship with one helping to advance the survival and spread of the other. Here we report on our ongoing efforts to map the spread of memetic infection using Twitter. Since March 23 we have been sampling tweets mentioning the terms “corona” and/or “covid”. Currently, we have collected   `r ntweets` million  tweets.
+
+
+Some emerging results include the following:
+
+- There is no sign that hoax meme has run its course. Over our admittedly short sample period of about two weeks the overal level of hoaxism remained stable.
+- There is some evidence that Donald Trump has to answer for the hoax meme. Hoax believers are particularly obsessed with him.
+- There is evidence that believe in Hoax led to more higher covid cases than necessary. Across US states we find a strong correlation between hoax believer rates and covid cases. 
+- We have evidence that is consistent with the idea that interaction between population density and hoaxism is a major factor in explaining the severety of the pandemic.
+- We have to be careful with causal interpretations but the numbers would imply that US covid cases could be about 23% lower in absence of hoaxism.
+
+
+
+
+# Hoaxism over time
+
+How bad is the hoax infection and is it getting better or worse? To identify tweeters believing in the hoax (or promoting the hoax idea) we look for tweets with one of the following hastags:
+
+- "#hoax"
+- "#coronahoax"
+- "#covidhoax"
+- "#chinesevirus"
+
+Using hashtags instead of string searches of the same terms provides a good distinction between tweets who display support for hoaxsim vs tweets criticising hoaxism. Note that this is likely a conservative way of counting hoaxist tweets and in reality a larger fraction of tweets are from people supporting hoaxist ideas.
+
+Below is a time series plot of the share of hoaxist tweets over our sample period. we report separate series for the Us and UK. Assigning location to tweets is notoriously difficult as most users have switch off detailed location tracking. In the figure below we base location on the analysis of a free text field where users can write something about their whereabouts. In many cases this refers to known areas although the detail varies (e.g. London, UK vs the Universe). Often it also involves phantasy locations (e.g. Walhalla). Hence, our "other" category might include tweeters from either the UK or Us who have chosen not to reveal their location.
+
+Note that towards the begining of the sample period the share of hoax tweets in all covid related tweets is less than 0.5%. However, the weekend  around the 28th of March saw a major outbreak of Hoaxism that was particularly bad in the UK. This has subsided somewhat come March 30. The whole sample trend would suggest that hoaxism is fairly stable and not subsiding.
+
+```{r tsplot,echo=FALSE}
+tsplot=ggplot(scomb, aes(x = date,y=hoaxsh,color=country  )  )+geom_point() +  geom_line() + theme_minimal() + xlab("Time") +ylab("Share of hoax tweets [%]")
+
+tsplot
+```
+
+
+```{r, echo=FALSE}
+scomb=scomb%>%group_by(date) %>% summarise(tot=sum(tweets)) %>% merge(scomb,by="date") %>% mutate(totsh=tweets/tot *100)
+
+tsp2=ggplot(scomb %>% filter(country!="ddother"), aes(x = date,y=tweets,color=country  )  )+geom_point() +  geom_line() + theme_minimal() + xlab("Time") +ylab("Share in %")
+
+#tsp2
+```
+
+
+
+
+
+
+
+
+
+
+# Why hoaxism?
+
+What are drivers of hoaxism? We can start exploring this by looking at the tweets of hoaxists more widely. Below we plot a word cloud of the last 1000 tweets of the 300 most prolific hoaxists. One hypothesis is that hoaxism has been fueled by Trumpism. Because of worries that a strong response to the pandemic could negatively affect the economy and thereby his re-election chances, he had a vested interest in playing down the crisis. The word cloud confirms that obsession with trump is prevalent among hoxists.
+
+```{r wordclouds,include=FALSE, echo=FALSE}
+
+#tmls['ccid'] <-     mapply(grepl, pattern="climate", x=tolower(tmls$text) )
+#tmls['trumpid'] <-  mapply(grepl, pattern="trump", x=tolower(tmls$text) )
+#tmls['clintonid'] <-  mapply(grepl, pattern="clinton", x=tolower(tmls$text) )  
+#tmls['coronaORcovid'] <-     mapply(grepl, pattern="corona", x=tolower(tmls$text) ) |  mapply(grepl, pattern="covid", x=tolower(tmls$text) )
+#summary(tmls$trumpid)
+#summary(tmls$clintonid)
+#summary(tmls$coronaORcovid)
+#cc=tmls%>%filter(ccid==TRUE)
+#nrow(tmls%>%filter(ccid==TRUE))
+
+library(tm)
+
+
+
+tmls=readRDS("../results/tmls.rda")
+tmlsnon=readRDS("../results/tmlsnon.rda")
+
+#names(tmls)
+
+keeps=c('status_id','text','created_at')
+texts=tmls[,keeps]
+
+
+texts=texts%>%dplyr::rename(doc_id=status_id)
+
+
+textsref=tmlsnon[,keeps]
+textsref=textsref%>%dplyr::rename(doc_id=status_id)
+
+
+
+
+
+
+#install.packages("wordcloud")
+library(wordcloud)
+#install.packages("RColorBrewer")
+library(RColorBrewer)
+#install.packages("wordcloud2")
+library(wordcloud2)
+
+
+wc=function(texts){
+    texts$text=gsub(" re ", " ", texts$text)
+    texts$text=gsub("untuk", " ", texts$text)
+    texts$text=gsub("uuuuuu", " ", texts$text)
+    texts$text=gsub("uuuuu", " ", texts$text)
+    texts$text=gsub("uuuu", " ", texts$text)
+    texts$text=gsub("uuu", " ", texts$text)
+    texts$text=gsub("uue", " ", texts$text)
+    texts$text=gsub("uu", " ", texts$text)
+    texts$text=gsub("más", "", texts$text)
+    texts$text=gsub("https\\S*", "", texts$text)
+    texts$text=gsub("@\\S*", ""    , texts$text)
+    texts$text=gsub("amp", "", texts$text) 
+    texts$text=gsub("[\r\n]", "", texts$text)
+    texts$text=gsub("[[:punct:]]", "", texts$text)
+  
+    
+    
+    docs=Corpus(DataframeSource(texts))
+    docs <- docs %>%
+      tm_map(removeNumbers) %>%
+      tm_map(removePunctuation) %>%
+      tm_map(stripWhitespace)
+    
+    docs <- tm_map(docs, content_transformer(tolower))
+    docs <- tm_map(docs, removeWords, stopwords("english"))
+    
+    dtm <- TermDocumentMatrix(docs) 
+    matrix <- as.matrix(dtm) 
+    words <- sort(rowSums(matrix),decreasing=TRUE) 
+    df <- data.frame(word = names(words),freq=words)
+    
+    
+    set.seed(1234) # for reproducibility 
+    wordcloud(words = df$word, freq = df$freq, min.freq = 1,       max.words=100, random.order=FALSE, rot.per=0.2,                colors=brewer.pal(8, "Dark2"))
+}
+```
+
+
+```{r wordcloudsregs, cache=TRUE, echo=FALSE}
+
+wc(texts)
+#names(combstream)
+#textsref=subset(comb, select = c(status_id,text))
+#textsref=textsref%>%rename(doc_id=status_id)
+```
+
+
+
+
+```{r,cache=TRUE,echo=FALSE}
+
+users=dget("../data/users.txt")
+scaler=2
+
+library(dplyr)
+nixhoaxers=users%>% filter(test<.1) # Random smaller sample
+
+users['test']=runif(nrow(users))
+
+
+nixhoaxers=users%>% filter((test< (scaler * .0001)) & itweets==0) # Random smaller sample
+hoaxers=users%>% filter((test < (scaler * .025)) & itweets>0) # Random smaller sample
+
+
+
+
+susers=rbind(nixhoaxers,hoaxers)
+
+#tsusers=head(susers,10)
+#res <- get_timelines(tsusers$user_id, n = 50, check=FALSE,fast=TRUE)
+
+
+#nrow(users%>%filter(itweets==0))
+
+manytlines=function(users){  #function to get timelines for large number of users
+  
+  #<<<< define catch
+         trytweets=function(clist){
+          # if we exceed twitter rate limits an error can emerge. We use tryCatch to deal with this
+          out <- tryCatch(
+              {   
+                  print("trial")
+                  res <- get_timelines(clist$user_id, n = 1000, check=FALSE,fast=TRUE)
+                  return(res)
+              },
+              error=function(cond) {
+                  print("error")
+                  print(cond)
+                  return(NULL)
+              }
+              ,
+              warning=function(cond) {
+                  #print(cond)
+                  #print("warn")
+                  return(res)
+              }
+          )
+          #print(out)
+          #return(out)
+        }
+  #>>>>
+
+  ulist=split(users, (seq(nrow(users))-1) %/% 100)   # split in manageable chunks
+  
+  # init results frame
+  cline <- get_timelines("mondpanther", n = 10,fast=TRUE)
+  
+  tweets=cline[0,] # initialize return df
+  
+  for (clist in ulist){
+     print(nrow(clist))
+     sres=trytweets(clist)
+     
+     while(is.null(sres)){
+        
+        # If there was an error Let's wait a while
+        Sys.sleep(60*5)
+        print("Wait 5 mins....")
+        
+        # Let's try again
+        sres=trytweets(clist)
+        
+     }
+     
+     tweets=rbind(tweets,sres) # combine with other tweets if it worked...
+    #sres=search_tweets(q = tt,n=10000, retryonratelimit = TRUE)
+      
+  }  # end for loop
+  
+  return(tweets)
+}
+
+tweets=manytlines(susers ) %>%  distinct(user_id,status_id, .keep_all = TRUE) 
+
+
+######
+library(lubridate)
+nnn=now() %>% gsub(" ","_",.) %>% gsub(" ","_",.)  %>% gsub("-","_",.)  %>% gsub(":","_",.)
+
+name=paste0("../data/timelines/climatehoax",nnn,".txt")
+print(name)
+dput(tweets, file = name, control = c("keepNA", "keepInteger", "showAttributes"))
+
+
+  
+
+  
+
+###############
+
+
+
+
+
+#ulist=str(split(df, (as.numeric(rownames(df))-1) %/% 100))
+ulist=split(users, (seq(nrow(users))-1) %/% 50) 
+
+#View(ulist[[1]][1,]$user_id)
+#test=ulist[[1]][1,"user_id"]
+
+cline <- get_timelines(ulist[[1]][1,]$user_id, n = 2)
+
+for (clist in ulist){
+  print(nrow(clist))
+  
+  cline <- get_timelines(clist$user_id, n = 200)
+  
+}
+
+
+texts['hoaxer']=TRUE
+textsref['hoaxer']=FALSE
+
+
+ctexts=rbind(texts,textsref)
+
+
+
+library(lubridate)
+
+start.date = ymd_hms("2019-01-01 00:00:00")
+end.date   = as_datetime(now()) #ymd_hms("2020-04-02 01:00:00")
+#end.date   = ymd_hms("2020-04-04 01:00:00")
+
+breaks = seq(start.date, end.date, "1 week")
+
+
+
+ctexts['week'] = cut(ctexts$created_at, breaks=breaks)
+
+
+
+
+
+
+ctexts['trumpid'] <-  mapply(grepl, pattern="trump", x=tolower(ctexts$text) )
+
+
+
+ctexts['climateid'] <-  mapply(grepl, pattern="climate", x=tolower(ctexts$text) )
+ctexts['hoaxid']    <-  mapply(grepl, pattern="hoax", x=tolower(ctexts$text) )
+
+ctexts=ctexts%>%mutate(climateXhoaxid=climateid==TRUE & hoaxid==TRUE)
+
+
+
+actexts=ctexts%>%group_by(week,hoaxer)%>%summarize(climateid=sum(climateid),climateXhoaxid=sum(climateXhoaxid),hoaxid=sum(hoaxid),tweets=n())
+
+
+
+
+actexts=actexts%>%mutate(date=ymd(week),climateXhoaxidsh=climateXhoaxid/tweets,climateidsh=climateid/tweets,hoaxsh=hoaxid/tweets)
+#scomb=scomb%>% mutate( date=ymd(sixh))
+
+
+actexts=actexts %>% filter(date>"2019-10-01")
+
+
+
+
+ggplot(actexts , aes(x = date,y=climateXhoaxid,color=hoaxer  )  )+geom_point() +  geom_line() + theme_minimal() + xlab("Time") +ylab("Share in %")
+
+
+ggplot(actexts , aes(x = week,y=climateidsh,color=hoaxer  )  )+geom_point() +  geom_line() + theme_minimal() + xlab("Time") +ylab("Share in %")
+#tsp2
+ggplot(actexts )  +  geom_line( aes(x = date,y=hoaxsh, color=hoaxer  )) + geom_line( aes(x = date,y=climateXhoaxidsh, color=hoaxer  ))+
+               theme_minimal() + xlab("Time") +ylab("Share in %")
+
+
+ggplot(actexts )+ geom_line( aes(x = date,y=climateXhoaxidsh, color=hoaxer  ))+
+               theme_minimal() + xlab("Time") +ylab("Share in %")
+
+ggplot(actexts , aes(x = week,y=tweets,color=hoaxer  )  )+geom_point() +  geom_line() + theme_minimal() + xlab("Time") +ylab("Share in %")
+
+
+
+
+tr2=lm(climateid~hoaxer,ctexts)
+tr3=lm(climateXhoaxid~hoaxer,ctexts)
+
+tr=lm(trumpid~hoaxer,ctexts)
+#summary(tr)
+summary(tr2)
+summary(tr3)
+
+
+
+
+```
+
+
+
+For comparison, here is a word cloud of the 300 most prolific non-hoaxist covid related tweeters. Trump is relevant here too although do a smaller degree: hoaxers have a  `r round(tr$coefficients[["hoaxerTRUE"]]*100,2) ` percentage point higher probability of mentioning Trump (The share of Trump mentions across both groups is `r round(mean(ctexts$trumpid)*100,2)`%). Of course it might also be that one group is supporting Trump whereas the other is opposing him. We will address this in future work. 
+
+
+
+
+```{r nonhoaxer,cache=TRUE,echo=FALSE}
+wc(textsref)
+
+
+```
+
+
+
+Also note that the term "filmyourhospital" shows up prominently, which according [reports](https://www.mediamatters.org/coronavirus-covid-19/coronavirus-denying-conspiracy-theory-hashtag-spreading-tiktok-infowars-host) is a hastag pushed by right-wing commentators.
+
+
