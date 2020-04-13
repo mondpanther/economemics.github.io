@@ -470,7 +470,7 @@ ggplot(stats) +
 
 To explore this more below we also undertake regression analysis. The Table below shows that:
 
-- Hoaxsim is indeed significantly and positively related to hoaxism (Column 1). The coefficient implies that a 1 percentage point higher hoaxism level is associated with 0.822 extra covid patients per 1000 citizens.
+- Hoaxsim is indeed significantly and positively related to hoaxism (Column 1). The coefficient implies that a 1 percentage point higher hoaxism level is associated with 1.38 extra covid patients per 1000 citizens.
 
 - This is result is highly robust to the inclusion of further controls such as population density, population size and covid tweet intensity (covid related tweets per 1000 people) in column 2. 
 
@@ -478,7 +478,7 @@ To explore this more below we also undertake regression analysis. The Table belo
 
 - In column 4, we identify the model from daily data rather than a cross sectional variation of the latest available period (day). This allows us to control to include state as well as day control (density is no longer separately identified as it becomes a fixed state level characterstics). Hence we implicity control for all fixed state characteristics that could might be confounding our estimate. This preserves our qualitative conclusions alhtough the estimates coefficients become lower.
 
-- In column 5 we repeat the exercise while dropping all observations from New York. This has little impact on the findings related to hoaxism (although the tweet x density interaction now turns negative)
+- In column 5 we repeat the exercise while dropping all observations from New York. This has little impact on the findings related to hoaxism.
 
 We have to be cautious with causal claims at this stage. Our results could be contingent on our  simple model specification or crude aggregation (e.g. we don't take into account that New York state consists of the metropolitian area of New York as well as rarther rural parts, although as we saw in column 5, the results are not contingent on New York). Still, to understand if the results are not only statistically significant but also quantitatively meaningful it is useful to ask what - if taken at face value - the impact of haoxism would be. Using the estimates from column 4 which we consider our most reliable at this stage would imply that without hoaxism  we had  `r format(round(saved,0),scientific=FALSE) ` covid cases less (of a total of `r format(all,scientific=FALSE)`), as of `r max(stats$date)`. Clearly, this is substantial.
 

@@ -277,7 +277,7 @@ manytlines=function(users){  #function to get timelines for large number of user
         }
   #>>>>
 
-  ulist=split(users, (seq(nrow(users))-1) %/% 100)   # split in manageable chunks
+  ulist=split(users, (seq(nrow(users))-1) %/% 500)   # split in manageable chunks
   
   # init results frame
   cline <- get_timelines("mondpanther", n = 10,fast=TRUE)
@@ -319,34 +319,56 @@ print(name)
 dput(tweets, file = name, control = c("keepNA", "keepInteger", "showAttributes"))
 
 
-  
-
-  
-
 ###############
 
 
 
 
+```
 
-#ulist=str(split(df, (as.numeric(rownames(df))-1) %/% 100))
-ulist=split(users, (seq(nrow(users))-1) %/% 50) 
 
-#View(ulist[[1]][1,]$user_id)
-#test=ulist[[1]][1,"user_id"]
 
-cline <- get_timelines(ulist[[1]][1,]$user_id, n = 2)
+```{r combine timelines}
 
-for (clist in ulist){
-  print(nrow(clist))
+vselect= c("created_at",
+           "user_id","status_id","text","location")
   
-  cline <- get_timelines(clist$user_id, n = 200)
-  
+
+flist=list.files("../data/timelines/")
+
+# Get existing combination file
+if (file.exists("../data/timelines.txt")) { tlines=dget("../data/timelines.txt")
+} else {
+  # Create empty start
+  name=paste0("../data/timelines/",flist[1])
+  cf=dget(name) 
+  cf=subset(cf, select = vselect)
+  tlines=cf[FALSE,]
 }
 
+tlines=subset(tlines, select = vselect)
 
-texts['hoaxer']=TRUE
-textsref['hoaxer']=FALSE
+
+for(i in flist){
+  
+    finf <- file.info(paste0("../data/timelines/",i), extra_cols = FALSE)
+    
+  
+    name=paste0("../data/timelines/",i)
+    print(name)
+
+    cf=dget(name)  %>% subset(., select = vselect)
+    
+    tlines=rbind(tlines,cf) %>% distinct(user_id,status_id, .keep_all = TRUE) 
+
+}
+
+dput(tlines, file = "../data/timelines.txt", control = c("keepNA", "keepInteger", "showAttributes"))
+
+
+
+#texts['hoaxer']=TRUE
+#textsref['hoaxer']=FALSE
 
 
 ctexts=rbind(texts,textsref)
