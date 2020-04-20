@@ -60,6 +60,12 @@ source("../code/gettoken.R")
 
 scomb=readRDS("../results/scomb.rda")
 
+#adf=readRDS("../results/adf.rda")
+
+#scomb=scomb%>%merge(adf,by="date")
+#scomb=scomb%>%mutate(scaler=ifelse(scaler<1,1,scaler))
+#scomb=scomb%>%mutate(stweets=tweets*scaler) %>%mutate(hoaxsh=igtweets/tweets)
+
 ntweets= round(sum(scomb$tweets) /10^6,2)
 
 
@@ -82,7 +88,7 @@ Some emerging results include the following:
 - There is some evidence that Donald Trump has to answer for the hoax meme. Hoax believers are particularly obsessed with him.
 - There is evidence that believe in Hoax led to more higher covid cases than necessary. Across US states we find a strong correlation between hoax believer rates and covid cases. 
 - We have evidence that is consistent with the idea that interaction between population density and hoaxism is a major factor in explaining the severety of the pandemic.
-- We have to be careful with causal interpretations but the numbers would imply that US covid cases could be about 23% lower in absence of hoaxism.
+- We have to be careful with causal interpretations but the numbers would imply that US covid cases could be about 20% lower in absence of hoaxism.
 
 
 
@@ -94,15 +100,19 @@ How bad is the hoax infection and is it getting better or worse? To identify twe
 - "#hoax"
 - "#coronahoax"
 - "#covidhoax"
-- "#chinesevirus"
+
 
 Using hashtags instead of string searches of the same terms provides a good distinction between tweets who display support for hoaxsim vs tweets criticising hoaxism. Note that this is likely a conservative way of counting hoaxist tweets and in reality a larger fraction of tweets are from people supporting hoaxist ideas.
 
 Below is a time series plot of the share of hoaxist tweets over our sample period. we report separate series for the Us and UK. Assigning location to tweets is notoriously difficult as most users have switch off detailed location tracking. In the figure below we base location on the analysis of a free text field where users can write something about their whereabouts. In many cases this refers to known areas although the detail varies (e.g. London, UK vs the Universe). Often it also involves phantasy locations (e.g. Walhalla). Hence, our "other" category might include tweeters from either the UK or Us who have chosen not to reveal their location.
 
-Note that towards the begining of the sample period the share of hoax tweets in all covid related tweets is less than 0.5%. However, the weekend  around the 28th of March saw a major outbreak of Hoaxism that was particularly bad in the UK. This has subsided somewhat come March 30. The whole sample trend would suggest that hoaxism is fairly stable and not subsiding.
+Note that towards the begining of the sample period the share of hoax tweets in all covid related tweets is less than 0.5%. However, the weekend  around the 28th of March saw a major outbreak of Hoaxism that was particularly bad in the UK. This has subsided somewhat come March 30. The whole sample trend would suggest that hoaxism is fairly stable and not subsiding, although there seems to be a declining trend for the last couple of days.
 
 ```{r tsplot,echo=FALSE}
+
+scomb=scomb%>% group_by(country) %>% arrange(date) %>% mutate(cumtweets=cumsum(tweets),cumigtweets=cumsum(igtweets)) %>% mutate(cumhoaxsh=cumigtweets/cumtweets)
+
+
 tsplot=ggplot(scomb, aes(x = date,y=hoaxsh,color=country  )  )+geom_point() +  geom_line() + theme_minimal() + xlab("Time") +ylab("Share of hoax tweets [%]")
 
 tsplot
@@ -112,9 +122,9 @@ tsplot
 ```{r, echo=FALSE}
 scomb=scomb%>%group_by(date) %>% summarise(tot=sum(tweets)) %>% merge(scomb,by="date") %>% mutate(totsh=tweets/tot *100)
 
-tsp2=ggplot(scomb %>% filter(country!="ddother"), aes(x = date,y=tweets,color=country  )  )+geom_point() +  geom_line() + theme_minimal() + xlab("Time") +ylab("Share in %")
-
-#tsp2
+  tsp2=ggplot(scomb %>% filter(country!="other"), aes(x = date,y=igtweets,color=country  )  )+geom_point() +  geom_line() + theme_minimal() + xlab("Time") +ylab("Share in %")
+  
+  #tsp2
 ```
 
 
@@ -246,11 +256,6 @@ breaks = seq(start.date, end.date, "1 week")
 
 ctexts['weeks'] = cut(ctexts$created_at, breaks=breaks)
 
-
-
-
-
-
 ctexts['trumpid'] <-  mapply(grepl, pattern="trump", x=tolower(ctexts$text) )
 
 
@@ -312,10 +317,15 @@ statsbyd=readRDS("../results/statsbyd.Rda")
 
 
 
+
+
 stats=stats%>%mutate(pop=pop/1000, hoaxshXdensity=(hoaxsh)*(density-mean(density)),tweetsPCXdensity=(tweetsPC)*(density-mean(density)))
 
 
 statsbyd=statsbyd%>%group_by(date)%>%mutate(mtweetsPC=mean(tweetsPC),mhoaxsh=mean(hoaxsh),mdensity=mean(density))
+
+#statsbyd=statsbyd%>%filter(as.character(date)>"2020-03-26")
+
 
 statsbyd=statsbyd%>%mutate(pop=pop/1000, hoaxshXdensity=(hoaxsh) *(density-mdensity),tweetsPCXdensity=(tweetsPC) * (density-mdensity) )
 

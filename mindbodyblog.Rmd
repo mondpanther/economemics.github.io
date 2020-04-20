@@ -1,7 +1,7 @@
 ---
 title: "Infections of the body and the mind"
-output: bookdown::html_document2
-#output: bookdown::word_document2
+#output: bookdown::html_document2
+output: bookdown::word_document2
 css:    mondstyle.css
 editor_options: 
 chunk_output_type: inline
@@ -75,7 +75,7 @@ nhoax=sum(scomb$igtweets)
 
 The coronavirus pandemic has changed everything overnight. Unfortunately, as the genetic sequence of the virus started to make its deadly journey through bodies around the world, in parallel a memetic sequence emerged in the minds of some people: the idea that covid19 pandemic is not real and a hoax. Indeed, the worry is that the two infections exist in a symbiotic relationship with one helping to advance the survival and spread of the other because widespread believe in Hoaxism might prevent people from following guidelines to limit the spread of the pandemic.
 
-To monitor and study this phenomenon we (a team of Imperial College and LSE researchers) have been sampling tweets mentioning the terms “corona” and/or “covid”. Since March 23 we have collected   `r ntweets` million  tweets. We measure hoaxsim by looking for tweets we look for tweets with the hastag hoax (or coronahoax, covidhoax). There was a massive spike in hoaxism around the weekend of March 28 with hoax tweet rates of over 4%. Dis-regarding that hoaxism progresses at a stable rate of about 0.5%.
+To monitor and study this phenomenon we (a team of Imperial College and LSE researchers) have been sampling tweets mentioning the terms “corona” and/or “covid”. Since March 23 we have collected   `r ntweets` million  tweets. We measure hoaxsism by looking for tweets we look for tweets with the hashtag #hoax (or #coronahoax, #covidhoax). There was a massive spike in hoaxism around the weekend of March 28 with hoax tweet rates of over 4% on some days. With the onset of April hoaxism declined to rates around 0.5%. Overall, we find a cumulate hoaxsim share of 0.5% for the UK and 0.7% for the UK.
 
 <br/><br/>
 
@@ -89,7 +89,7 @@ tsplot
 <br/><br/>
 
 
-What are the drivers hoaxism? One hypothesis is that hoaxism was driven by the Trump Junta who had a vested interest in downplaying the crisis because of worries that the economic fallout could dampen Trump's re-election chances. We can examine this by looking at word clouds of all tweets by prolific hoaxist tweeters:
+What are the drivers hoaxism? One hypothesis is that hoaxism was driven by Donald Trump who had a vested interest in downplaying the crisis because of worries that the economic fallout could dampen his re-election chances. We can examine this by looking at word clouds of all tweets by prolific hoaxist tweeters:
 
 
 
@@ -212,11 +212,11 @@ tr=lm(trumpid~hoaxer,ctexts)
 
 
 
-We find indeed that Trump is a popular term among hoaxists. Indeed we find that his probability of being mentioned by hoaxists is significantly larger than among non hoaxist covid tweeters (`r round((tr$coefficients[["hoaxerTRUE"]]+tr$coefficients[["(Intercept)"]])*100,2)`%  as opposed to `r round((tr$coefficients[["(Intercept)"]])*100,2)`%)
+We find that Trump is a popular term among hoaxists. Indeed, we find that his probability of being mentioned by hoaxists is significantly larger than among non hoaxist covid tweeters (`r round((tr$coefficients[["hoaxerTRUE"]]+tr$coefficients[["(Intercept)"]])*100,2)`%  as opposed to `r round((tr$coefficients[["(Intercept)"]])*100,2)`%)
 
 
-Of course, the big question is if all of this matters for actual covid outcomes? To start answering this, we correlated infection rates (covid19 cases per 1000 residents) with hoaxism infection rates at the level of US states (see Figure 2). It is very striking that New York does not only have record levels of covid infections but also record levels of hoaxism. But of course, there are other states (notably Alaska and Alabahma) with high hoaxism levels but rather low infection rates. Various people have suggested that population density is an important factor in explaining covid infection rates.  A hypothesis that emerges from  our current observations is that what matters is the interaction between the two. This is particularly plausible when comparing New York and New Jersey, which has higher density but lower covid and lower hoaxism rates than New York.
-What's more: while we have to be cautious in interpreting correlation as causation, a causal interpretation of our current numbers would imply substantial impacts of hoaxism: For the US as a whole it could suggest that about 30% of covid cases are down to hoaxism. 
+Of course, the big question is whether hoaxism matters for actual covid outcomes? Clearly, if people don't believe the threat is real they might not take precautions and ignore lockdown rules. But does this matter in practice? To start answering this, we correlated infection rates (covid-19 cases per 1000 residents) with hoaxism infection rates at the level of US states (see Figure 2). It is very striking that New York does not only have record levels of covid infections but also record levels of hoaxism. But of course, there are other states (notably Alaska and Alabama) with high hoaxism levels but rather low infection rates. Various people have suggested that population density is an important factor in explaining covid infection rates.  A hypothesis that emerges from  our current observations is that what matters is the interaction between the two. This is particularly plausible when comparing New York and New Jersey, which has higher density but lower covid and lower hoaxism rates than New York.
+What's more: while we have to be cautious in interpreting correlation as causation, a causal interpretation of our current numbers would imply substantial impacts of hoaxism: For the US as a whole it could suggest that the number of covid would have been about 20% lower without hoaxism. 
 Clearly, this warrants further investigation. One issue with the results for New York could be that we lump metropolitian areas of New York city with rather rural areas of New York state.
 We will therefore continue to monitor and analyse hoaxists tweets. Updates will be [here](https://mondpanther.github.io/economemics.github.io/mindbody.html).
 
