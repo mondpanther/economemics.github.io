@@ -1,7 +1,7 @@
 ---
 title: "Infections of the body and the mind"
-#output: bookdown::html_document2
-output: bookdown::word_document2
+output: bookdown::html_document2
+#output: bookdown::word_document2
 css:    mondstyle.css
 editor_options: 
 chunk_output_type: inline
