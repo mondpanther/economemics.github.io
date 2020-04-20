@@ -1,0 +1,17 @@
+base
+methods
+datasets
+utils
+grDevices
+graphics
+stats
+rtweet
+tidytext
+ggplot2
+dplyr
+gdata
+NLP
+tm
+RColorBrewer
+wordcloud
+wordcloud2
