@@ -70,7 +70,7 @@ ntweets= round(sum(scomb$tweets) /10^6,2)
 nhoax=sum(scomb$igtweets)
 
 # save to github
-write.csv(scomb,"hoaxshare_over_time.csv")
+write.csv(scomb,"./hoaxshare_over_time.csv")
 
 ```
 
@@ -303,7 +303,7 @@ Also note that the term "filmyourhospital" shows up prominently, which according
 # The consequences of memetic infections
 
 We examine if US state level hoax infection rates are correlated with reported covid19 infection rates. This is interesting to gauge if mis-information has any effect on actual outcomes. Clearly, from a simple exercise like that we cannot draw overly strong conclusions about causal effects. However, it is a useful starting point. 
-The figure below is a scatter plot of state level per capita infection rates on the share of hoax tweets (in percent) from within the state. There is clearly a positive relationship. What is particularly striking is that New York is not only extreme in terms of infections but also in the prevalenc of hoaxism.
+The figure below is a scatter plot of state level per capita infection rates on the share of hoax tweets (in percent) from within the state. There is clearly a positive relationship. What is particularly striking is that New York is not only extreme in terms of infections but also in the prevalence of hoaxism.
 
 <br/><br/>
 
@@ -438,8 +438,8 @@ all=base::sum(stats$cases)
 # Write to github repo
 
 # save to github
-write.csv(stats,"US_scatter.csv")
-write.csv(statsbyd,"US_timeseries.csv")
+write.csv(stats,"./data/US_scatter.csv")
+write.csv(statsbyd,"./data/US_timeseries.csv")
 
 
 
@@ -527,6 +527,7 @@ stargazer(r1,  r2, r4 ,r6,r7, type = "html",  omit=c("state","date","Constant") 
 ```
 
 <br/><br/>
+For the data underlying the figures click [here](https://mondpanther.github.io/economemics.github.io/data/).
 
 
 
@@ -571,3 +572,5 @@ tsplot
 
 
 ```
+
+
