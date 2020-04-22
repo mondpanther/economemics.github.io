@@ -67,10 +67,10 @@ scomb=readRDS("../results/scomb.rda")
 #scomb=scomb%>%mutate(stweets=tweets*scaler) %>%mutate(hoaxsh=igtweets/tweets)
 
 ntweets= round(sum(scomb$tweets) /10^6,2)
-
-
-
 nhoax=sum(scomb$igtweets)
+
+# save to github
+write.csv(scomb,"hoaxshare_over_time.csv")
 
 ```
 
@@ -435,6 +435,11 @@ all=base::sum(stats$cases)
 #summary(lm(casesPC~hoaxsh+density+tweetsPC,stats%>%filter(state!="New York")))
 
 
+# Write to github repo
+
+# save to github
+write.csv(stats,"US_scatter.csv")
+write.csv(statsbyd,"US_timeseries.csv")
 
 
 
