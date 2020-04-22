@@ -70,7 +70,7 @@ ntweets= round(sum(scomb$tweets) /10^6,2)
 nhoax=sum(scomb$igtweets)
 
 # save to github
-write.csv(scomb,"./hoaxshare_over_time.csv")
+write.csv(scomb,"./data/hoaxshare_over_time.csv")
 
 ```
 
@@ -104,7 +104,8 @@ How bad is the hoax infection and is it getting better or worse? To identify twe
 
 Using hashtags instead of string searches of the same terms provides a good distinction between tweets who display support for hoaxsim vs tweets criticising hoaxism. Note that this is likely a conservative way of counting hoaxist tweets and in reality a larger fraction of tweets are from people supporting hoaxist ideas.
 
-Below is a time series plot of the share of hoaxist tweets over our sample period. we report separate series for the Us and UK. Assigning location to tweets is notoriously difficult as most users have switch off detailed location tracking. In the figure below we base location on the analysis of a free text field where users can write something about their whereabouts. In many cases this refers to known areas although the detail varies (e.g. London, UK vs the Universe). Often it also involves phantasy locations (e.g. Walhalla). Hence, our "other" category might include tweeters from either the UK or Us who have chosen not to reveal their location.
+Below is a time series plot of the share of hoaxist tweets over our sample period.^[Data [here](https://mondpanther.github.io/economemics.github.io/data/hoaxshare_over_time.csv)]]
+] we report separate series for the Us and UK. Assigning location to tweets is notoriously difficult as most users have switch off detailed location tracking. In the figure below we base location on the analysis of a free text field where users can write something about their whereabouts. In many cases this refers to known areas although the detail varies (e.g. London, UK vs the Universe). Often it also involves phantasy locations (e.g. Walhalla). Hence, our "other" category might include tweeters from either the UK or Us who have chosen not to reveal their location.
 
 Note that towards the begining of the sample period the share of hoax tweets in all covid related tweets is less than 0.5%. However, the weekend  around the 28th of March saw a major outbreak of Hoaxism that was particularly bad in the UK. This has subsided somewhat come March 30. The whole sample trend would suggest that hoaxism is fairly stable and not subsiding, although there seems to be a declining trend for the last couple of days.
 
@@ -117,6 +118,7 @@ tsplot=ggplot(scomb, aes(x = date,y=hoaxsh,color=country  )  )+geom_point() +  g
 
 tsplot
 ```
+
 
 
 ```{r, echo=FALSE}
@@ -303,7 +305,7 @@ Also note that the term "filmyourhospital" shows up prominently, which according
 # The consequences of memetic infections
 
 We examine if US state level hoax infection rates are correlated with reported covid19 infection rates. This is interesting to gauge if mis-information has any effect on actual outcomes. Clearly, from a simple exercise like that we cannot draw overly strong conclusions about causal effects. However, it is a useful starting point. 
-The figure below is a scatter plot of state level per capita infection rates on the share of hoax tweets (in percent) from within the state. There is clearly a positive relationship. What is particularly striking is that New York is not only extreme in terms of infections but also in the prevalence of hoaxism.
+The figure below^[Scatterplot data is [here](https://mondpanther.github.io/economemics.github.io/data/US_scatter.csv).] is a scatter plot of state level per capita infection rates on the share of hoax tweets (in percent) from within the state. There is clearly a positive relationship. What is particularly striking is that New York is not only extreme in terms of infections but also in the prevalence of hoaxism.
 
 <br/><br/>
 
@@ -483,7 +485,7 @@ ggplot(stats) +
 <br/><br/>
 
 
-To explore this more below we also undertake regression analysis. The Table below shows that:
+To explore this more below we also undertake regression analysis.^[Underlying data is [here](https://mondpanther.github.io/economemics.github.io/data/US_timeseries.csv).] The Table below shows that:
 
 - Hoaxsim is indeed significantly and positively related to hoaxism (Column 1). The coefficient implies that a 1 percentage point higher hoaxism level is associated with 1.38 extra covid patients per 1000 citizens.
 
@@ -525,9 +527,9 @@ stargazer(r1,  r2, r4 ,r6,r7, type = "html",  omit=c("state","date","Constant") 
           ))
 
 ```
-
+ 
 <br/><br/>
-For the data underlying the figures click [here](https://mondpanther.github.io/economemics.github.io/data/).
+
 
 
 
