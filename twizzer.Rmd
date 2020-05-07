@@ -1,0 +1,297 @@
+---
+title: "The CEP Economist Twizz"
+output: html_document
+css:    mondstyle.css
+editor_options: 
+  chunk_output_type: inline
+chunk_output_type: inline
+---
+
+Do you know what which words your colleagues are made of?
+
+
+```{r setup, include=FALSE,echo=FALSE,message=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(rtweet)
+library(tidytext)
+
+# plotting and pipes - tidyverse!
+library(ggplot2)
+library(dplyr)
+library(gdata)
+library(fst)
+
+
+source("../code/gettoken.R")
+
+
+```
+
+
+
+
+```{r get handles,echo=FALSE,include=FALSE}
+
+handlelist=readRDS("../code/handlelist.rds")
+
+```
+
+
+
+
+```{r,include=FALSE,echo=FALSE}
+xitflag=FALSE
+if (file.exists("../code/econtweets.fst")) {
+    xitflag=TRUE
+    xtweets=read_fst("../code/econtweets.fst")  
+}
+
+```
+
+
+
+
+
+
+```{r sample timelines,echo=FALSE, cache=TRUE,include=FALSE}
+
+
+library(dplyr)
+
+  
+
+  
+manytlines=function(users){  #function to get timelines for large number of users
+  #users=handlelist
+  #<<<< define catch
+         trytweets=function(clist){
+          # if we exceed twitter rate limits an error can emerge. We use tryCatch to deal with this
+          out <- tryCatch(
+              {   
+                  print("trial")
+                  res <- get_timelines(clist$handle, n = 2000, check=FALSE,fast=TRUE)
+                  return(res)
+              },
+              error=function(cond) {
+                  print("error")
+                  print(cond)
+                  return(NULL)
+              }
+          )
+          #print(out)
+          #return(out)
+        }
+  #>>>>
+
+  ulist=split(users, (seq(nrow(users))-1) %/% 400)   # split in manageable chunks
+  
+  # init results frame
+  cline <- get_timelines("paulmromer", n = 10,fast=TRUE)
+  
+  tweets=cline[0,] # initialize return df
+  #test=ulist[[1]]
+  for (clist in ulist){
+     print(nrow(clist))
+  
+     sres=trytweets(clist)
+     
+     while(is.null(sres)){
+        
+        # If there was an error Let's wait a while
+        Sys.sleep(60*5)
+        print("Wait 5 mins....")
+        
+        # Let's try again
+        sres=trytweets(clist)
+        
+     }
+     
+     tweets=bind_rows(tweets,sres) # combine with other tweets if it worked...
+    #sres=search_tweets(q = tt,n=10000, retryonratelimit = TRUE)
+      
+  }  # end for loop
+  
+  return(tweets)
+}
+
+```
+
+```{r tweetsampling,echo=FALSE}
+library(stringr)
+handlelist=handlelist %>% mutate(handle=str_replace(handle, "@", ""))
+
+usehandlelist=handlelist
+
+if(xitflag){
+  #already=c("paulkrugman")
+  already=xtweets$screen_name %>% unique()
+  usehandlelist=handlelist%>% filter((handle %in% already)==FALSE)
+}
+if(nrow(usehandlelist)>0){  
+  tweets=manytlines(usehandlelist ) %>%  distinct(status_id, .keep_all = TRUE) 
+  names(tweets)
+  tweets=tweets %>% select(user_id, screen_name,status_id, created_at,retweet_count,text,screen_name)
+
+  if( xitflag==TRUE) bind_rows(tweets,xtweets)
+  
+  write_fst(tweets,"../code/econtweets.fst")  
+} else tweets=xtweets
+
+```  
+  
+
+```{r,include=FALSE,echo=FALSE,message=FALSE}
+
+# quick stats
+names(tweets)
+tweets_agg=tweets %>% group_by(screen_name) %>% summarise(tweets=n())
+
+
+
+
+
+```
+
+
+
+```{r wordcloudsfuncs, echo=FALSE,cache=TRUE,message=FALSE}
+
+library(tm)
+
+
+
+
+library(wordcloud)
+
+library(RColorBrewer)
+
+library(wordcloud2)
+library(stringi)
+
+wc=function(texts){
+    library(stringi)
+    library(tm)
+    library(wordcloud)
+    library(wordcloud2)
+    texts$text=gsub(" re ", " ", texts$text)
+    texts$text=gsub("untuk", " ", texts$text)
+    texts$text=gsub("uuuuuu", " ", texts$text)
+    texts$text=gsub("uuuuu", " ", texts$text)
+    texts$text=gsub("uuuu", " ", texts$text)
+    texts$text=gsub("uuu", " ", texts$text)
+    texts$text=gsub("uue", " ", texts$text)
+    texts$text=gsub("uu", " ", texts$text)
+    texts$text=gsub("más", "", texts$text)
+    texts$text=gsub("https\\S*", "", texts$text)
+    texts$text=gsub("@\\S*", ""    , texts$text)
+    texts$text=gsub("amp", "", texts$text) 
+    texts$text=gsub("[\r\n]", "", texts$text)
+    texts$text=gsub("[[:punct:]]", "", texts$text)
+  
+    
+    texts=texts %>% mutate(text= stri_trans_general(str = text,   id = "Latin-ASCII"))
+    
+    docs=Corpus(DataframeSource(texts))
+    docs <- docs %>%
+      tm_map(removeNumbers) %>%
+      tm_map(removePunctuation) %>%
+      tm_map(stripWhitespace)
+    
+    docs <- tm_map(docs, content_transformer(tolower))
+    docs <- tm_map(docs, removeWords, stopwords("english"))
+    
+    docs= tm_map(docs, removeWords, c("isnt","dhingra",
+                                      "dont","piketty","novy","machin","ia€™m","€","ia€™s",
+                                      "stephen","ive","pour","les"))
+    
+    
+    dtm <- TermDocumentMatrix(docs) 
+    matrix <- as.matrix(dtm) 
+    words <- sort(rowSums(matrix),decreasing=TRUE) 
+    df <- data.frame(word = names(words),freq=words)
+    
+    
+    set.seed(123) # for reproducibility 
+    #wordcloud2(words=df$word)
+    #png("wordcloud_packages.png", width=12,height=8, units='in', res=300)
+    #wordcloud2(df , color="random-dark", 
+    #           backgroundColor = "white", size = 1)
+
+
+    wordcloud(words = df$word, freq = df$freq, min.freq = 5, scale=c(2,.6),
+              max.words=100, random.order=FALSE, rot.per=0.2,           
+              colors=brewer.pal(8, "Dark2"))
+}
+
+
+```
+
+
+
+
+```{r wordclouds, cache=TRUE,echo=FALSE}
+
+
+texts=tweets %>% ungroup() %>% select(status_id,text,screen_name) %>% rename(doc_id=status_id)
+
+# create id
+names=texts%>%  distinct(screen_name)
+names=names %>% mutate(r=runif(nrow(names))) %>% arrange(r)  %>% mutate(id=1:n())
+
+
+
+``` 
+
+
+
+
+
+```{r define clouder,echo=FALSE}
+clouder=function(name){
+  #name="paulkrugman"
+  id=(names %>% filter(screen_name==name))$id
+
+  cat(paste0("# Wordcloud Number ",id),sep="\n")
+  cat("<br></br>",sep="\n")
+  #cat("<br></br>",sep="\n")
+  
+  wc(texts %>% filter(screen_name==name))
+  cat("<br></br>",sep="\n")
+  cat("Whose wordcloud is this? Your options are:" ,sep="\n")
+  cat("<br></br>",sep="\n")
+  cat(paste(handlelist$name," | "))
+  #cat("<br></br>",sep="\n")
+  cat("<br></br>",sep="\n")
+  cat("",sep="\n")
+  #cat("<br></br>",sep="\n")
+  cat("-----",sep="\n")
+  cat("",sep="\n")
+  cat("<br></br>",sep="\n")
+  cat("",sep="\n")
+  cat("",sep="\n")
+}
+
+```
+
+
+Welcome to the CEP Economist Twizz!
+
+To play, note down your best guess about whose word cloud belongs to whom.
+
+```{r make a set of clouds,echo=FALSE,message=FALSE,results='asis',warning=FALSE}
+saveRDS(names,"../code/twizzernames.rds")
+
+for(name in names$screen_name){
+  #print(name)
+  clouder(name)
+} 
+  
+  
+  #clouder(name)
+
+```
+
+
+
+
