@@ -188,7 +188,7 @@ wc=function(texts){
     texts$text=gsub("amp", "", texts$text) 
     texts$text=gsub("[\r\n]", "", texts$text)
     texts$text=gsub("[[:punct:]]", "", texts$text)
-  
+    texts <- texts %>% mutate(text=str_replace_all(text, pattern= "[&â€¦™ðŸ¥]" , replacement= ""))
     
     texts=texts %>% mutate(text= stri_trans_general(str = text,   id = "Latin-ASCII"))
     
@@ -205,7 +205,7 @@ wc=function(texts){
                                       "dont","piketty","novy","machin","ia€™m","€","ia€™s",
                                       "stephen","ive","pour","les"))
     
-    
+    #docs <- tm_map(docs, toSpace, "€")
     dtm <- TermDocumentMatrix(docs) 
     matrix <- as.matrix(dtm) 
     words <- sort(rowSums(matrix),decreasing=TRUE) 
