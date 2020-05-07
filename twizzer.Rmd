@@ -133,7 +133,7 @@ if(nrow(usehandlelist)>0){
   names(tweets)
   tweets=tweets %>% select(user_id, screen_name,status_id, created_at,retweet_count,text,screen_name)
 
-  if( xitflag==TRUE) bind_rows(tweets,xtweets)
+  if( xitflag==TRUE) tweets=bind_rows(tweets,xtweets)
   
   write_fst(tweets,"../code/econtweets.fst")  
 } else tweets=xtweets
@@ -145,7 +145,7 @@ if(nrow(usehandlelist)>0){
 
 # quick stats
 names(tweets)
-tweets_agg=tweets %>% group_by(screen_name) %>% summarise(tweets=n())
+tweets_agg=tweets %>% group_by(screen_name) %>% dplyr::summarise(tweets=n() )
 
 
 
@@ -233,11 +233,11 @@ wc=function(texts){
 ```{r wordclouds, cache=TRUE,echo=FALSE}
 
 
-texts=tweets %>% ungroup() %>% select(status_id,text,screen_name) %>% rename(doc_id=status_id)
+texts=tweets %>% ungroup() %>% select(status_id,text,screen_name) %>% dplyr::rename(doc_id=status_id)
 
 # create id
 names=texts%>%  distinct(screen_name)
-names=names %>% mutate(r=runif(nrow(names))) %>% arrange(r)  %>% mutate(id=1:n())
+names=names %>% mutate(r=runif(nrow(names))) %>% arrange(r)  %>% dplyr::mutate(id=1:n())
 
 
 
