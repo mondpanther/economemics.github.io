@@ -7,12 +7,10 @@ editor_options:
 chunk_output_type: inline
 ---
 
-
-Welcome to the CEP Economist Twizz!
-
 Do you know which words your colleagues are made of?
 
-To play, note down your best guess about which word cloud belongs to whom.
+Solutions to the CEP Economist Twizz.
+
 
 ```{r setup, include=FALSE,echo=FALSE,message=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
@@ -44,121 +42,15 @@ handlelist=readRDS("../code/handlelist.rds")
 
 
 
-```{r,include=FALSE,echo=FALSE}
-xitflag=FALSE
-if (file.exists("../code/econtweets.fst")) {
-    
-    xitflag=TRUE
-    
-    xtweets=read_fst("../code/econtweets.fst")  
-}
 
-```
-
-
-
-
-
-
-```{r sample timelines,echo=FALSE, cache=TRUE,include=FALSE}
-
-
-library(dplyr)
-
-  
-
-  
-manytlines=function(users){  #function to get timelines for large number of users
-  #users=handlelist
-  #<<<< define catch
-         trytweets=function(clist){
-          # if we exceed twitter rate limits an error can emerge. We use tryCatch to deal with this
-          out <- tryCatch(
-              {   
-                  print("trial")
-                  res <- get_timelines(clist$handle, n = 2000, check=FALSE,fast=TRUE)
-                  return(res)
-              },
-              error=function(cond) {
-                  print("error")
-                  print(cond)
-                  return(NULL)
-              }
-          )
-          #print(out)
-          #return(out)
-        }
-  #>>>>
-
-  ulist=split(users, (seq(nrow(users))-1) %/% 400)   # split in manageable chunks
-  
-  # init results frame
-  cline <- get_timelines("paulmromer", n = 10,fast=TRUE)
-  
-  tweets=cline[0,] # initialize return df
-  #test=ulist[[1]]
-  for (clist in ulist){
-     print(nrow(clist))
-  
-     sres=trytweets(clist)
-     
-     while(is.null(sres)){
-        
-        # If there was an error Let's wait a while
-        Sys.sleep(60*5)
-        print("Wait 5 mins....")
-        
-        # Let's try again
-        sres=trytweets(clist)
-        
-     }
-     
-     tweets=bind_rows(tweets,sres) # combine with other tweets if it worked...
-    #sres=search_tweets(q = tt,n=10000, retryonratelimit = TRUE)
-      
-  }  # end for loop
-  
-  return(tweets)
-}
-
-```
-
-```{r tweetsampling,echo=FALSE}
+```{r get tweets and order,echo=FALSE}
 library(stringr)
-handlelist=handlelist %>% mutate(handle=str_replace(handle, "@", ""))
 
-usehandlelist=handlelist
+tweets=read_fst("../code/econtweets.fst")
 
-if(xitflag){
-  #already=c("paulkrugman")
-  already=xtweets$screen_name %>% unique()
-  usehandlelist=handlelist%>% filter((handle %in% already)==FALSE)
-}
-if(nrow(usehandlelist)>0){  
-  tweets=manytlines(usehandlelist ) %>%  distinct(status_id, .keep_all = TRUE) 
-  names(tweets)
-  tweets=tweets %>% select(user_id, screen_name,status_id, created_at,retweet_count,text,screen_name)
-
-  if( xitflag==TRUE) tweets=bind_rows(tweets,xtweets)
-  
-  write_fst(tweets,"../code/econtweets.fst")  
-} else tweets=xtweets
 
 ```  
   
-
-```{r,include=FALSE,echo=FALSE,message=FALSE}
-
-# quick stats
-names(tweets)
-tweets_agg=tweets %>% group_by(screen_name) %>% dplyr::summarise(tweets=n() )
-
-
-
-
-
-```
-
 
 
 ```{r wordcloudsfuncs, echo=FALSE,cache=FALSE,message=FALSE}
@@ -254,19 +146,22 @@ names=names %>% mutate(r=runif(nrow(names))) %>% arrange(r)  %>% dplyr::mutate(i
 
 
 ```{r define clouder,echo=FALSE}
-clouder=function(name){
-  #name="paulkrugman"
-  id=(names %>% filter(screen_name==name))$id
-
-  cat(paste0("# Wordcloud Number ",id),sep="\n")
+clouder=function(tname){
+  #tname="paulkrugman"
+  id=(names %>% filter(screen_name==tname))$id
+  library(stringr)
+  
+  realname=(handlelist %>% filter(str_trim(handle)==tname))$name
+  
+  cat(paste0("# Wordcloud Number ",id," from tweets by ",realname),sep="\n")
   cat("<br></br>",sep="\n")
   #cat("<br></br>",sep="\n")
   
-  wc(texts %>% filter(screen_name==name))
+  wc(texts %>% filter(screen_name==tname))
   cat("<br></br>",sep="\n")
-  cat("Whose wordcloud is this? Your options are:" ,sep="\n")
+  #cat("Whose wordcloud is this? Your options are:" ,sep="\n")
   cat("<br></br>",sep="\n")
-  cat(paste(handlelist$name," | "))
+  #cat(paste(handlelist$name," | "))
   #cat("<br></br>",sep="\n")
   cat("<br></br>",sep="\n")
   cat("",sep="\n")
@@ -283,7 +178,7 @@ clouder=function(name){
 
 
 ```{r make a set of clouds,echo=FALSE,message=FALSE,results='asis',warning=FALSE}
-saveRDS(names,"../code/twizzernames.rds")
+names=readRDS("../code/twizzernames.rds")
 
 for(name in names$screen_name){
   #print(name)
